@@ -337,6 +337,8 @@
         return "Maxim-ar";
       } else if (str.includes("porta de giro")) {
         return "PGR";
+      } else if (str.includes("oscilo") || str.includes("osc") || str.includes("abt")) {
+        return "Oscilo";
       } else if (str.includes("pivotante")) {
         return "Pivotante";
       } else if (str.includes("brise")) {
@@ -627,22 +629,23 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna COR na Tabela Processada – somente para linhas que contenham "CEY" ou "ROB" na coluna ITENS (índice 1)
+    // Atualiza a Coluna COR na Tabela Processada –
+    // Atualiza apenas as linhas cujo valor na coluna ITENS contenha "CEY" ou "ROB"
+    // O conteúdo da célula COR será substituído pelo novo texto informado pelo usuário.
     function updateCol9() {
-      const newColorText = document.getElementById("col9Color").value.trim();
-      if (!newColorText) {
+      const newCor = document.getElementById("col9Color").value.trim();
+      if (!newCor) {
         alert("Informe o novo texto (cor) para atualização.");
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
       for (let i = 0; i < processedData.length; i++) {
-        // Verifica se na coluna "ITENS" contém "CEY" ou "ROB" (case insensitive)
+        // Verifica se na coluna "ITENS" (índice 1) contém "CEY" ou "ROB" (case insensitive)
         const itensValue = processedData[i][1] ? processedData[i][1].toLowerCase() : "";
         if (itensValue.includes("cey") || itensValue.includes("rob")) {
           let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
-          cell.textContent = newColorText;
-          cell.style.color = newColorText;
-          processedData[i][4] = newColorText;
+          cell.textContent = newCor;
+          processedData[i][4] = newCor;
         }
       }
       alert("Atualização da Coluna COR concluída!");
