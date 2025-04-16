@@ -6,65 +6,75 @@
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #fafafa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
       color: #333;
+      line-height: 1.6;
+      padding: 20px;
     }
     h1, h2, h3 {
       text-align: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
     .container, .update-panel {
-      width: 90%;
-      max-width: 960px;
-      margin: auto;
-      margin-bottom: 30px;
+      max-width: 1200px;
+      background: #fff;
+      padding: 20px;
+      margin: 20px auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    .container input[type="file"],
+    .container input[type="text"],
+    .container select {
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+    }
+    button {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      margin: 8px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
     }
     table {
-      border-collapse: collapse;
       width: 100%;
+      border-collapse: collapse;
       margin-top: 10px;
       overflow-x: auto;
       display: block;
     }
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: 1px solid #ddd;
+      padding: 12px 8px;
       text-align: center;
       word-break: break-word;
     }
     th {
-      background-color: #f4f4f4;
-    }
-    button {
-      margin-top: 10px;
-      margin-right: 10px;
-      padding: 8px 12px;
-      border: none;
-      background-color: #337ab7;
-      color: white;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    button:hover {
-      background-color: #286090;
-    }
-    input[type="file"],
-    input[type="text"],
-    select {
-      padding: 6px;
-      margin: 5px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      background: #f0f0f0;
     }
     @media (max-width: 600px) {
       th, td {
-        padding: 6px;
+        padding: 8px 4px;
       }
       button {
-        padding: 6px 10px;
+        padding: 8px 12px;
         font-size: 14px;
       }
     }
@@ -73,95 +83,101 @@
 <body>
 
   <h1>Leitor e Processador de CSV</h1>
+
   <div class="container">
     <input type="file" id="csvFile" accept=".csv">
-    <br>
-    <!-- Botões para exportar Planilha 1 -->
-    <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
-    <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
-    <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+    <div>
+      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+    </div>
   </div>
 
-  <h2>Tabela Processada</h2>
-  <table id="resultTable">
-    <thead>
-      <tr>
-        <th>Coluna 1</th>
-        <th>Coluna 2</th>
-        <th>Coluna 3</th>
-        <th>Coluna 4</th>
-        <th>Coluna 5</th>
-        <th>Coluna 9</th>
-        <th>Novo Código</th>
-        <th>Novo Código 2</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1</td><td>P01</td><td>ACM-PORTA</td><td>PORTA PIVOTANTE EM ACM</td><td>1700</td><td>PINTURA PRETO FOSCO - RAL9005F</td><td>ACM</td><td>Layer</td>
-      </tr>
-      <tr>
-        <td>2</td><td>AD-2</td><td>REH-JUNÇÃO 90º</td><td>FIXO 02 MODULOS CONJUGADOS EM 90° COM PERFIL NA ESQUINA</td><td>2955</td><td>MAR - CEY - CEY</td><td>Fixo</td><td>PVC</td>
-      </tr>
-      <!-- demais linhas conforme exemplo -->
-    </tbody>
-  </table>
+  <div class="container">
+    <h2>Tabela Processada</h2>
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>Coluna 1</th>
+          <th>Coluna 2</th>
+          <th>Coluna 3</th>
+          <th>Coluna 4</th>
+          <th>Coluna 5</th>
+          <th>Coluna 9</th>
+          <th>Novo Código</th>
+          <th>Novo Código 2</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Tabela ficará vazia até o CSV ser carregado -->
+      </tbody>
+    </table>
+  </div>
 
-  <!-- Painel para atualizar a Coluna 9 -->
   <div class="update-panel">
     <h3>Atualizar Coluna 9</h3>
-    <label for="col9Option">Selecione a opção: </label>
-    <select id="col9Option">
-      <option value="MAR - CEY - CEY">MAR - CEY - CEY</option>
-      <option value="MAR - ROB - ROB">MAR - ROB - ROB</option>
-    </select>
-    &nbsp;&nbsp;
-    <label for="col9Color">Cor (HEX ou nome): </label>
-    <input type="text" id="col9Color" placeholder="#ff0000 ou red">
-    &nbsp;&nbsp;
-    <button onclick="updateCol9()">Confirmar Atualização</button>
+    <div>
+      <label for="col9Option">Selecione a opção:</label>
+      <select id="col9Option">
+        <option value="MAR - CEY - CEY">MAR - CEY - CEY</option>
+        <option value="MAR - ROB - ROB">MAR - ROB - ROB</option>
+      </select>
+    </div>
+    <div>
+      <label for="col9Color">Cor (HEX ou nome):</label>
+      <input type="text" id="col9Color" placeholder="#ff0000 ou red">
+    </div>
+    <div>
+      <button onclick="updateCol9()">Confirmar Atualização</button>
+    </div>
   </div>
 
-  <!-- Botões para exportar a Tabela Resumo (Planilha 1 – contagem dos códigos da coluna 4) -->
   <div class="container">
-    <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
-    <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
-    <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
+    <div>
+      <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
+      <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
+      <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
+    </div>
   </div>
 
-  <h2>Resumo de Códigos (Coluna 4)</h2>
-  <table id="summaryTable">
-    <thead>
-      <tr>
-        <th>Código</th>
-        <th>Quantidade</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <!-- Botões para exportar a Tabela Resumo 2 (Planilha 2 – contagem dos códigos gerados da coluna 3) -->
   <div class="container">
-    <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
-    <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
-    <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
+    <h2>Resumo de Códigos (Coluna 4)</h2>
+    <table id="summaryTable">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Quantidade</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
-  <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
-  <table id="summaryTable2">
-    <thead>
-      <tr>
-        <th>Tipo</th>
-        <th>Quantidade</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="container">
+    <div>
+      <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
+      <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
+      <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
+    <table id="summaryTable2">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Quantidade</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
   <script>
     let processedData = []; // Dados da Planilha 1
-    const summaryCounts = {}; // Contagem dos códigos derivados da coluna 4 (Novo Código)
-    const summaryCounts2 = {}; // Contagem dos códigos derivados da coluna 3 (Novo Código 2)
+    const summaryCounts = {}; // Contagem dos códigos derivados da Coluna 4 (Novo Código)
+    const summaryCounts2 = {}; // Contagem dos códigos derivados da Coluna 3 (Novo Código 2)
     let totalItens = 0;     // Soma dos valores da 8ª coluna (índice 7 do CSV)
 
     // Função para determinar o Novo Código (a partir da Coluna 4)
@@ -223,7 +239,7 @@
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
           const rows = results.data;
-          // Processa cada linha (pular linhas com poucos dados)
+          // Processa cada linha (ignora linhas com dados insuficientes)
           rows.forEach(row => {
             if (!row || row.length < 9) return;
             // Mantém as colunas: 1,2,3,4,5,9 (índices: 0,1,2,3,4,8)
@@ -260,7 +276,7 @@
       });
     }
 
-    // Renderiza a Tabela Resumo (Novo Código – coluna 4)
+    // Renderiza a Tabela Resumo (Novo Código – Coluna 4)
     function renderSummaryTable() {
       const tbody = document.querySelector("#summaryTable tbody");
       tbody.innerHTML = "";
@@ -274,7 +290,7 @@
       tbody.appendChild(trTotal);
     }
 
-    // Renderiza a Tabela Resumo 2 (Novo Código 2 – coluna 3)
+    // Renderiza a Tabela Resumo 2 (Novo Código 2 – Coluna 3)
     function renderSummaryTable2() {
       const tbody = document.querySelector("#summaryTable2 tbody");
       tbody.innerHTML = "";
@@ -468,21 +484,25 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (índice 5 na Planilha 1) aplicando a cor escolhida,
-    // desde que o conteúdo da célula (desconsiderando espaços) contenha a opção selecionada
+    // Atualiza a Coluna 9 (índice 5 na Planilha 1) apenas alterando a cor de fundo,
+    // desde que o conteúdo (normalizado, sem espaços e em maiúsculas)
+    // contenha a opção selecionada
     function updateCol9() {
       const selectedOption = document.getElementById("col9Option").value;
       const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
       const tbody = document.querySelector("#resultTable tbody");
       const normalizedSelected = selectedOption.toUpperCase().replace(/\s/g, '');
+      
+      // Verifica cada célula da Coluna 9
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9
         let normalizedCell = cell.textContent.toUpperCase().replace(/\s/g, '');
         if (normalizedCell.includes(normalizedSelected)) {
           cell.style.backgroundColor = color;
+          console.log("Atualizou célula com:", cell.textContent);
         }
       }
-      alert("Coluna 9 atualizada!");
+      alert("Atualização da Coluna 9 concluída!");
     }
   </script>
 </body>
