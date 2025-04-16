@@ -89,7 +89,7 @@
 
   <h1>Leitor e Processador de CSV</h1>
   <div class="container">
-    <!-- Aceita CSV e TXT -->
+    <!-- Aceita arquivos CSV e TXT -->
     <input type="file" id="csvFile" accept=".csv,.txt">
     <div>
       <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
@@ -221,7 +221,7 @@
       return "PVC";
     }
 
-    // Ao selecionar o arquivo CSV (ou TXT)
+    // Ao selecionar o arquivo CSV/TXT
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -245,7 +245,7 @@
             processedData.push(newRow);
             if (codigo) { summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1; }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-            let quantidade = Number(row[7].replace(",","."));
+            let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) { totalItens += quantidade; }
           });
           renderResultTable();
@@ -328,7 +328,7 @@
       navigator.clipboard.writeText(text).then(() => { alert("Resumo 2 copiado para a área de transferência!"); });
     }
 
-    // Exporta Planilha 1 para CSV (observação: CSV não inclui estilos)
+    // Exporta Planilha 1 para CSV (nota: CSV não inclui estilos)
     function exportCSV() {
       const header = ["Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5", "Coluna 9", "Novo Código", "Novo Código 2"];
       let csvContent = header.join(",") + "\n";
@@ -479,8 +479,9 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (índice 5 na Planilha 1) apenas aplicando a cor de fundo,
-    // se o conteúdo (em caixa alta) contiver "CEY-" ou "ROB"
+    // Atualiza a Coluna 9 (índice 5 na Planilha 1)
+    // Verifica se o conteúdo (em caixa alta) contém "CEY" ou "ROB"
+    // Se sim, aplica a cor de fundo e modifica o formato do texto (negrito e cor da fonte branca)
     function updateCol9() {
       const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
       const tbody = document.querySelector("#resultTable tbody");
@@ -489,7 +490,8 @@
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
           cell.style.backgroundColor = color;
-          console.log("Atualizou célula:", cell.textContent);
+          cell.style.fontWeight = "bold";
+          cell.style.color = "#fff";
         }
       }
       alert("Atualização da Coluna 9 concluída!");
