@@ -324,7 +324,6 @@
     // Função para determinar o PRODUTO (a partir da DESCRIÇÃO – COLUNA 4)
     function getCodigo(texto) {
       const str = texto.toLowerCase();
-      // Mantenha todas as regras existentes, apenas adicionando a regra da "Oscilo":
       if (str.includes("fixo")) {
         return "Fixo";
       } else if (str.includes("porta de correr") && str.includes("persiana")) {
@@ -392,14 +391,10 @@
             // Acrescenta os valores derivados como PRODUTO e CATEGORIA
             const newRow = selected.concat(codigo, codigo2);
             processedData.push(newRow);
-            // Incrementa contagem de PRODUTO
             if (codigo) {
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
-            // Incrementa contagem de CATEGORIA
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-
-            // Soma de itens (coluna 8 no CSV, índice 7)
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
@@ -459,7 +454,7 @@
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
-      // Começa do índice 1 (pulando o header)
+      // Copia apenas as linhas a partir do índice 1 (pulando o cabeçalho)
       for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
         for (let cell of table.rows[i].cells) {
@@ -643,7 +638,7 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza TODA a Coluna COR na Tabela Processada para o texto informado
+    // Atualiza a coluna COR apenas para as linhas cujo valor da coluna ITENS contenha "cey" ou "rob"
     function updateCol9() {
       const newCor = document.getElementById("col9Color").value.trim();
       if (!newCor) {
@@ -651,10 +646,13 @@
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
-      // Substitui o conteúdo da coluna 5 (índice 4) em todas as linhas
+      // Percorre os registros; atualiza apenas se a coluna ITENS conter "cey" ou "rob"
       for (let i = 0; i < processedData.length; i++) {
-        tbody.rows[i].cells[4].textContent = newCor;
-        processedData[i][4] = newCor;
+        let itensValue = processedData[i][1] ? processedData[i][1].toLowerCase() : "";
+        if (itensValue.includes("cey") || itensValue.includes("rob")) {
+          tbody.rows[i].cells[4].textContent = newCor;
+          processedData[i][4] = newCor;
+        }
       }
       alert("Atualização da Coluna COR concluída!");
     }
