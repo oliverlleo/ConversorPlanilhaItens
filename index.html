@@ -5,10 +5,16 @@
   <title>PROCESSADOR DE CSV</title>
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Fonte Roboto -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+
   <style>
     /* Reset Básico */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+    }
     body {
       font-family: 'Roboto', sans-serif;
       background: #f5f7fa;
@@ -17,46 +23,69 @@
       padding: 20px;
     }
     h1, h2, h3 {
-      text-align: center;
       margin-bottom: 20px;
       text-transform: uppercase;
+      text-align: center;
     }
-    .container, .update-panel, .resumo-box {
+
+    /* Barra superior: tudo em uma linha */
+    .top-bar {
       max-width: 1200px;
       background: #fff;
+      margin: 0 auto 20px auto;
       padding: 20px;
-      margin: 20px auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+      display: flex;               /* Organiza em linha */
+      flex-wrap: wrap;            /* Permite quebra em telas pequenas */
+      align-items: center;         /* Alinha verticalmente no centro */
+      justify-content: space-between; /* Separa os grupos com espaçamento */
+      gap: 10px;
     }
-    .container input[type="file"],
-    .container input[type="text"],
-    .container select {
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
+
+    /* Cada "setor" na barra superior */
+    .file-group, 
+    .btn-group, 
+    .update-group {
+      display: flex; 
+      align-items: center;
+      gap: 10px;
     }
-    .btn-primary {
+    .file-group input[type="file"] {
+      min-width: 200px;
+    }
+
+    button {
       background: #007BFF;
       color: #fff;
       border: none;
       padding: 10px 16px;
-      margin: 8px 4px;
       border-radius: 4px;
       cursor: pointer;
       transition: background 0.3s;
     }
-    .btn-primary:hover {
+    button:hover {
       background: #0056b3;
     }
+
+    /* Container geral para tabela principal */
+    .container {
+      max-width: 1200px;
+      background: #fff;
+      padding: 20px;
+      margin: 0 auto 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Tabela principal */
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
       overflow-x: auto;
-      display: block;
+      display: block; 
     }
     th, td {
       border: 1px solid #ddd;
@@ -64,87 +93,88 @@
       text-align: center;
       word-break: break-word;
     }
-    th { background: #f0f0f0; }
-    /* Área de atualização combinada com container superior */
-    .top-container {
-      max-width: 1200px;
-      background: #fff;
-      padding: 20px;
-      margin: 20px auto;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 20px;
+    th {
+      background: #f0f0f0;
     }
-    .top-container > div { flex: 1; }
-    .update-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    /* Layout para os resumos lado a lado, com centralização da tabela */
+
+    /* Área das duas tabelas de resumo lado a lado */
     .resumos-container {
-      display: flex;
-      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex; 
       gap: 20px;
       justify-content: center;
+      flex-wrap: wrap; /* Para quebrar em telas menores */
     }
     .resumo-box {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
+      flex: 1 1 400px; /* Cresce e diminui conforme espaço */
       max-width: 600px;
       background: #fff;
-      padding: 15px;
-      border: 1px solid #ddd;
+      padding: 20px;
       border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    .table-container {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-bottom: 10px;
-    }
-    .table-container table { width: 90%; }
-    .btn-container {
-      margin-top: auto;
-      width: 100%;
+    /* Centraliza a tabela dentro do resumo */
+    .resumo-table-container {
+      margin: 0 auto;
+      overflow-x: auto;
       text-align: center;
     }
-    .btn-group {
-      display: flex;
-      justify-content: center;
+    .resumo-table-container table {
+      margin: 10px auto 0 auto; /* Centraliza a tabela em si */
+      width: auto;              /* Para que não ocupe 100% se não precisar */
+    }
+
+    /* Container de botões na parte de baixo do resumo */
+    .btn-container {
+      margin-top: 15px;
+      text-align: center;
+    }
+    .btn-container .btn-group {
+      display: inline-flex;
       gap: 10px;
       flex-wrap: wrap;
+      justify-content: center;
     }
+
     @media (max-width: 600px) {
-      th, td { padding: 8px 4px; }
-      .btn-primary { padding: 8px 12px; font-size: 14px; }
-      .table-container table { width: 100%; }
+      th, td {
+        padding: 8px 4px;
+      }
+      button {
+        padding: 8px 12px; 
+        font-size: 14px;
+      }
+      .resumo-table-container table {
+        width: 100%; 
+        margin: 10px 0;
+      }
     }
   </style>
 </head>
 <body>
 
   <h1>PROCESSADOR DE CSV</h1>
-  
-  <div class="top-container">
-    <div>
-      <!-- Aceita arquivos CSV e TXT -->
+
+  <!-- Barra superior, tudo em linha -->
+  <div class="top-bar">
+    <!-- Grupo 1: Escolher arquivo -->
+    <div class="file-group">
       <input type="file" id="csvFile" accept=".csv,.txt">
     </div>
+
+    <!-- Grupo 2: Botões da planilha -->
     <div class="btn-group">
-      <button class="btn-primary" onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
-      <button class="btn-primary" onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
-      <button class="btn-primary" onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
     </div>
+
+    <!-- Grupo 3: Atualizar Coluna 9 -->
     <div class="update-group">
-      <label for="col9Color">ATUALIZAR COLUNA 9:</label>
+      <label for="col9Color" style="white-space:nowrap;">ATUALIZAR COLUNA 9:</label>
       <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
-      <button class="btn-primary" onclick="updateCol9()">Confirmar</button>
+      <button onclick="updateCol9()">Confirmar</button>
     </div>
   </div>
 
@@ -164,16 +194,17 @@
         </tr>
       </thead>
       <tbody>
-        <!-- A tabela será preenchida após o carregamento do CSV -->
+        <!-- Dados da tabela são preenchidos dinamicamente -->
       </tbody>
     </table>
   </div>
 
-  <!-- Área dos Resumos - organizados lado a lado -->
+  <!-- Resumos lado a lado -->
   <div class="resumos-container">
+    
     <div class="resumo-box">
       <h2>RESUMO DE CÓDIGOS (COLUNA 4)</h2>
-      <div class="table-container">
+      <div class="resumo-table-container">
         <table id="summaryTable">
           <thead>
             <tr>
@@ -186,16 +217,16 @@
       </div>
       <div class="btn-container">
         <div class="btn-group">
-          <button class="btn-primary" onclick="exportCSVSummary()">Exportar CSV</button>
-          <button class="btn-primary" onclick="exportXLSSummary()">Exportar XLS</button>
-          <button class="btn-primary" onclick="copySummaryTable()">Copiar (para Notion)</button>
+          <button onclick="exportCSVSummary()">Exportar CSV</button>
+          <button onclick="exportXLSSummary()">Exportar XLS</button>
+          <button onclick="copySummaryTable()">Copiar (para Notion)</button>
         </div>
       </div>
     </div>
 
     <div class="resumo-box">
       <h2>RESUMO DE CÓDIGOS (COLUNA 3 - NOVO CÓDIGO 2)</h2>
-      <div class="table-container">
+      <div class="resumo-table-container">
         <table id="summaryTable2">
           <thead>
             <tr>
@@ -208,9 +239,9 @@
       </div>
       <div class="btn-container">
         <div class="btn-group">
-          <button class="btn-primary" onclick="exportCSVSummary2()">Exportar CSV</button>
-          <button class="btn-primary" onclick="exportXLSSummary2()">Exportar XLS</button>
-          <button class="btn-primary" onclick="copySummaryTable2()">Copiar (para Notion)</button>
+          <button onclick="exportCSVSummary2()">Exportar CSV</button>
+          <button onclick="exportXLSSummary2()">Exportar XLS</button>
+          <button onclick="copySummaryTable2()">Copiar (para Notion)</button>
         </div>
       </div>
     </div>
@@ -268,17 +299,19 @@
       return "PVC";
     }
 
-    // Ao selecionar o arquivo CSV/TXT
+    // Leitura do arquivo CSV/TXT
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
+
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
-          // Reinicia as contagens
+          // Zera contagens anteriores
           for (let key in summaryCounts) { delete summaryCounts[key]; }
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
+
           const rows = results.data;
           // Processa cada linha (ignora linhas com dados insuficientes)
           rows.forEach(row => {
@@ -288,17 +321,29 @@
             const codigo = getCodigo(row[3] || "");
             const codigo2 = getCodigo2(row[2] || "");
             const newRow = selected.concat(codigo, codigo2);
+
             processedData.push(newRow);
-            if (codigo) { summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1; }
+
+            // Atualiza contagens
+            if (codigo) { 
+              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1; 
+            }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
+
+            // Soma coluna 8 (índice 7) se houver
             let quantidade = Number(row[7].replace(",", "."));
-            if (!isNaN(quantidade)) { totalItens += quantidade; }
+            if (!isNaN(quantidade)) { 
+              totalItens += quantidade; 
+            }
           });
+
           renderResultTable();
           renderSummaryTable();
           renderSummaryTable2();
         },
-        error: function(err) { alert("Erro ao ler o CSV: " + err.message); }
+        error: function(err) {
+          alert("Erro ao ler o CSV: " + err.message);
+        }
       });
     });
 
@@ -342,7 +387,7 @@
       });
     }
 
-    // Função para converter tabela em texto tab-delimitado (para copiar ao Notion)
+    // Copiar tabelas / converter
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
@@ -355,28 +400,31 @@
       }
       return text;
     }
-
-    // Copia Planilha 1 para a área de transferência
     function copyProcessedTable() {
       const text = copyTableText("resultTable");
-      navigator.clipboard.writeText(text).then(() => { alert("Planilha 1 copiada para a área de transferência!"); });
+      navigator.clipboard.writeText(text).then(() => { 
+        alert("Planilha 1 copiada para a área de transferência!");
+      });
     }
-
-    // Copia Resumo 1 para o clipboard
     function copySummaryTable() {
       const text = copyTableText("summaryTable");
-      navigator.clipboard.writeText(text).then(() => { alert("Resumo 1 copiado para a área de transferência!"); });
+      navigator.clipboard.writeText(text).then(() => { 
+        alert("Resumo 1 copiado para a área de transferência!");
+      });
     }
-
-    // Copia Resumo 2 para o clipboard
     function copySummaryTable2() {
       const text = copyTableText("summaryTable2");
-      navigator.clipboard.writeText(text).then(() => { alert("Resumo 2 copiado para a área de transferência!"); });
+      navigator.clipboard.writeText(text).then(() => { 
+        alert("Resumo 2 copiado para a área de transferência!");
+      });
     }
 
-    // Exporta Planilha 1 para CSV (nota: CSV não inclui estilos)
+    // Exportar tabelas - CSV/XLS
     function exportCSV() {
-      const header = ["Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5", "Coluna 9", "Novo Código", "Novo Código 2"];
+      const header = [
+        "Coluna 1","Coluna 2","Coluna 3","Coluna 4",
+        "Coluna 5","Coluna 9","Novo Código","Novo Código 2"
+      ];
       let csvContent = header.join(",") + "\n";
       processedData.forEach(row => {
         const line = row.map(item => `"${item}"`).join(",");
@@ -391,8 +439,6 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Exporta Planilha 1 para XLS (o HTML exporta os estilos aplicados)
     function exportXLS() {
       let tableHTML = `
         <table border="1">
@@ -411,7 +457,9 @@
           <tbody>`;
       processedData.forEach(row => {
         tableHTML += "<tr>";
-        row.forEach(item => { tableHTML += "<td>" + item + "</td>"; });
+        row.forEach(item => { 
+          tableHTML += "<td>" + item + "</td>"; 
+        });
         tableHTML += "</tr>";
       });
       tableHTML += `</tbody></table>`;
@@ -424,8 +472,6 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Exporta Resumo 1 para CSV
     function exportCSVSummary() {
       const header = ["Código", "Quantidade"];
       let csvContent = header.join(",") + "\n";
@@ -445,8 +491,6 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Exporta Resumo 1 para XLS
     function exportXLSSummary() {
       let tableHTML = `
         <table border="1">
@@ -461,7 +505,9 @@
       rows.forEach(row => {
         tableHTML += "<tr>";
         const cells = row.querySelectorAll("td");
-        cells.forEach(cell => { tableHTML += "<td>" + cell.innerText + "</td>"; });
+        cells.forEach(cell => { 
+          tableHTML += "<td>" + cell.innerText + "</td>"; 
+        });
         tableHTML += "</tr>";
       });
       tableHTML += `</tbody></table>`;
@@ -474,8 +520,6 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Exporta Resumo 2 para CSV
     function exportCSVSummary2() {
       const header = ["Tipo", "Quantidade"];
       let csvContent = header.join(",") + "\n";
@@ -495,8 +539,6 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Exporta Resumo 2 para XLS
     function exportXLSSummary2() {
       let tableHTML = `
         <table border="1">
@@ -511,7 +553,9 @@
       rows.forEach(row => {
         tableHTML += "<tr>";
         const cells = row.querySelectorAll("td");
-        cells.forEach(cell => { tableHTML += "<td>" + cell.innerText + "</td>"; });
+        cells.forEach(cell => { 
+          tableHTML += "<td>" + cell.innerText + "</td>"; 
+        });
         tableHTML += "</tr>";
       });
       tableHTML += `</tbody></table>`;
@@ -526,8 +570,6 @@
     }
 
     // Atualiza a Coluna 9 (índice 5 na Planilha 1)
-    // Se o conteúdo (em caixa alta) contiver "CEY" ou "ROB",
-    // substitui o texto da célula pelo valor digitado no campo.
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
