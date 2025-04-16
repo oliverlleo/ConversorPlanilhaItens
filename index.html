@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>PROCESSADOR DE CSV</title>
+  <title>TRATAMENTO PLANILHA ITENS</title>
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <!-- Fonte Roboto -->
@@ -126,7 +126,7 @@
     }
     th {
       background: #f0f0f0;
-      text-align: center; /* Centraliza texto horizontalmente */
+      text-align: center;
     }
 
     /* Área dos resumos */
@@ -139,10 +139,7 @@
       flex-wrap: wrap;
     }
 
-    /* Div do resumo:
-       - Container flex vertical
-       - Botões fixos na parte inferior
-       - Sem centralizar verticalmente para não "subir" a tabela */
+    /* Div do resumo */
     .resumo-box {
       flex: 1 1 400px;
       max-width: 600px;
@@ -152,25 +149,24 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      justify-content: flex-start; /* Botões ficam "embaixo", título/tabela em cima */
-      align-items: center;        /* Remove a centralização vertical */
-position: relative;
-  padding-bottom: 80px; /* espaço pros botões */
+      justify-content: flex-start;
+      align-items: center;
+      position: relative;
+      padding-bottom: 80px;
     }
-   .btn-container {
-  margin-top: auto; /* Faz os botões irem pro final da div */
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding-top: 20px;
-}
+    .btn-container {
+      margin-top: auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 20px;
+    }
 
     /* Centraliza a tabela horizontalmente dentro do container de resumo */
     .resumo-table-container {
       width: 100%;
       text-align: center;
       margin: 0 auto;
-      /* Removido overflow-x: auto daqui para evitar esticar, mas pode manter se necessário */
     }
     .resumo-table-container table {
       margin: 0 auto;
@@ -179,7 +175,7 @@ position: relative;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       width: auto;
-      display: inline-block; /* Permite centralização horizontal por meio do margin: 0 auto */
+      display: inline-block;
     }
 
     /* Fixação do container de botões na parte inferior do resumo */
@@ -203,21 +199,20 @@ position: relative;
         padding: 8px 12px;
         font-size: 14px;
       }
-      /* Caso precise rolar horizontalmente em telas pequenas */
       .resumo-table-container {
         overflow-x: auto;
       }
       .resumo-table-container table {
         width: 100%;
         margin: 10px 0;
-        display: table;  /* Volta a display table para ocupar toda a largura em mobile */
+        display: table;
       }
     }
   </style>
 </head>
 <body>
 
-  <h1>PROCESSADOR DE CSV</h1>
+  <h1>TRATAMENTO PLANILHA ITENS</h1>
 
   <!-- Barra superior -->
   <div class="top-bar">
@@ -235,7 +230,7 @@ position: relative;
 
     <!-- Grupo 3: Atualizar Coluna 9 -->
     <div class="update-group">
-      <label for="col9Color" style="white-space:nowrap;">ATUALIZAR COLUNA 9:</label>
+      <label for="col9Color" style="white-space:nowrap;">COR:</label>
       <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
       <button onclick="updateCol9()">Confirmar</button>
     </div>
@@ -246,7 +241,6 @@ position: relative;
     <table id="resultTable">
       <thead>
         <tr>
-          <th>COLUNA 1</th>
           <th>COLUNA 2</th>
           <th>COLUNA 3</th>
           <th>COLUNA 4</th>
@@ -265,7 +259,7 @@ position: relative;
   <!-- Resumos lado a lado -->
   <div class="resumos-container">
     <div class="resumo-box">
-      <h2>RESUMO DE CÓDIGOS (COLUNA 4)</h2>
+      <h2>TOTAL TIPOS</h2>
       <div class="resumo-table-container">
         <table id="summaryTable">
           <thead>
@@ -287,7 +281,7 @@ position: relative;
     </div>
 
     <div class="resumo-box">
-      <h2>RESUMO DE CÓDIGOS (COLUNA 3 - NOVO CÓDIGO 2)</h2>
+      <h2>TOTAL PRODUTO</h2>
       <div class="resumo-table-container">
         <table id="summaryTable2">
           <thead>
@@ -376,8 +370,8 @@ position: relative;
           // Processa cada linha (ignora linhas com dados insuficientes)
           rows.forEach(row => {
             if (!row || row.length < 9) return;
-            // Seleciona as colunas: 1,2,3,4,5,9 (índices: 0,1,2,3,4,8)
-            const selected = [row[0], row[1], row[2], row[3], row[4], row[8]];
+            // Seleciona as colunas: 2,3,4,5,9 (índices: 1,2,3,4,8)
+            const selected = [row[1], row[2], row[3], row[4], row[8]];
             const codigo = getCodigo(row[3] || "");
             const codigo2 = getCodigo2(row[2] || "");
             const newRow = selected.concat(codigo, codigo2);
@@ -387,7 +381,7 @@ position: relative;
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-            // Soma coluna 8 (índice 7) se houver
+            // Soma a coluna 8 (índice 7 do CSV) se houver
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
@@ -443,13 +437,14 @@ position: relative;
       });
     }
 
-    // Funções para copiar o conteúdo das tabelas
+    // Função para copiar o conteúdo das tabelas (sem os cabeçalhos)
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
-      for (let row of table.rows) {
+      // Começa a partir da segunda linha (pula o cabeçalho)
+      for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
-        for (let cell of row.cells) {
+        for (let cell of table.rows[i].cells) {
           rowText.push(cell.innerText);
         }
         text += rowText.join("\t") + "\n";
@@ -478,8 +473,8 @@ position: relative;
     // Exportar tabelas - CSV/XLS
     function exportCSV() {
       const header = [
-        "Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4",
-        "Coluna 5", "Coluna 9", "Novo Código", "Novo Código 2"
+        "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5",
+        "Coluna 9", "Novo Código", "Novo Código 2"
       ];
       let csvContent = header.join(",") + "\n";
       processedData.forEach(row => {
@@ -500,7 +495,6 @@ position: relative;
         <table border="1">
           <thead>
             <tr>
-              <th>Coluna 1</th>
               <th>Coluna 2</th>
               <th>Coluna 3</th>
               <th>Coluna 4</th>
@@ -625,7 +619,7 @@ position: relative;
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (índice 5 na Planilha 1)
+    // Atualiza a Coluna 9 (agora na posição 5 - índice 4) na Planilha 1
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
@@ -635,13 +629,13 @@ position: relative;
       const tbody = document.querySelector("#resultTable tbody");
       // Atualiza cada célula da coluna 9 e também o array processedData
       for (let i = 0; i < tbody.rows.length; i++) {
-        let cell = tbody.rows[i].cells[5]; // Coluna 9
+        let cell = tbody.rows[i].cells[4]; // Nova posição da Coluna 9
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
           cell.textContent = newColorText;
           cell.style.color = newColorText; // Altera a cor do texto exibido
           // Atualiza o processedData para que as exportações reflitam a mudança
-          processedData[i][5] = newColorText;
+          processedData[i][4] = newColorText;
           console.log("Atualizou célula:", cell.textContent);
         }
       }
