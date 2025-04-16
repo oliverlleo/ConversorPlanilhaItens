@@ -6,25 +6,20 @@
   <title>TRATAMENTO PLANILHA ITENS | PERFECTA</title>
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <!-- Fonte Montserrat (mais moderna) -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Ícones do Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonte Montserrat (moderna) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* --- Cores atualizadas (vermelho no lugar do azul) --- */
     :root {
-      --primary-color: #e74c3c;
-      --primary-dark: #c0392b;
-      --secondary-color: #2c3e50;
-      --light-gray: #f8f9fa;
-      --medium-gray: #e9ecef;
-      --dark-gray: #343a40;
-      --text-color: #495057;
-      --white: #ffffff;
-      --border-radius: 8px;
-      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      --transition: all 0.3s ease;
+      --vermelho: #e74c3c;
+      --vermelho-escuro: #c0392b;
+      --cinza-escuro: #2c3e50;
+      --cinza-claro: #ecf0f1;
+      --branco: #ffffff;
+      --sombra: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
+    /* --- Reset e estilos gerais (sem alterar funcionalidade) --- */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -33,300 +28,213 @@
 
     body {
       font-family: 'Montserrat', sans-serif;
-      background-color: var(--light-gray);
-      color: var(--text-color);
+      background-color: var(--cinza-claro);
+      color: #333;
       line-height: 1.6;
-      padding: 0;
-    }
-
-    /* Layout Container */
-    .app-container {
-      max-width: 1400px;
-      margin: 0 auto;
       padding: 20px;
     }
 
-    /* Header Moderno */
+    /* --- Cabeçalho modernizado (mesma estrutura) --- */
     .main-header {
-      background-color: var(--white);
+      background-color: var(--branco);
       padding: 15px 0;
-      box-shadow: var(--box-shadow);
+      box-shadow: var(--sombra);
       margin-bottom: 30px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
     }
 
     .header-content {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      max-width: 1400px;
+      justify-content: center;
+      gap: 20px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 0 20px;
     }
 
     .main-header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: var(--secondary-color);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--cinza-escuro);
       margin: 0;
       text-transform: uppercase;
-      letter-spacing: 1px;
     }
 
     .logo {
-      height: 40px;
-      transition: var(--transition);
+      height: 50px;
     }
 
-    .logo:hover {
-      transform: scale(1.05);
-    }
-
-    /* Painel de Controle */
-    .control-panel {
-      background-color: var(--white);
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
+    /* --- Barra superior (mesmos IDs e classes) --- */
+    .top-bar {
+      max-width: 1200px;
+      background: var(--branco);
+      margin: 0 auto 30px auto;
       padding: 20px;
-      margin-bottom: 30px;
+      border-radius: 8px;
+      box-shadow: var(--sombra);
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
       gap: 15px;
-      align-items: center;
     }
 
-    .file-upload {
-      position: relative;
-      flex: 1 1 300px;
-    }
-
-    .file-upload input[type="file"] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-
-    .file-upload-label {
+    .file-group, .btn-group, .update-group {
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 10px;
-      background-color: var(--primary-color);
-      color: var(--white);
-      padding: 12px 20px;
-      border-radius: var(--border-radius);
+    }
+
+    /* --- Input de arquivo (mesmo funcionamento) --- */
+    .file-group input[type="file"] {
+      min-width: 200px;
+      padding: 10px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background-color: var(--branco);
       cursor: pointer;
-      transition: var(--transition);
-      font-weight: 500;
+      font-size: 14px;
     }
 
-    .file-upload-label:hover {
-      background-color: var(--primary-dark);
+    .file-group input[type="file"]::-webkit-file-upload-button {
+      visibility: hidden;
     }
 
-    .btn {
-      background-color: var(--secondary-color);
-      color: var(--white);
+    .file-group input[type="file"]::before {
+      content: 'Escolher arquivo';
+      display: inline-block;
+      background: var(--vermelho);
+      color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: var(--border-radius);
+      padding: 10px 15px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: var(--transition);
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.9rem;
+      font-size: 14px;
+      margin-right: 10px;
+      transition: background 0.3s;
     }
 
-    .btn:hover {
-      background-color: var(--dark-gray);
-      transform: translateY(-2px);
+    .file-group input[type="file"]:hover::before {
+      background: var(--vermelho-escuro);
     }
 
-    .btn-primary {
-      background-color: var(--primary-color);
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-dark);
-    }
-
-    .btn-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .color-input-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1 1 250px;
-    }
-
-    .color-input {
-      padding: 12px 15px;
-      border: 1px solid var(--medium-gray);
-      border-radius: var(--border-radius);
-      flex: 1;
-      transition: var(--transition);
-    }
-
-    .color-input:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
-    }
-
-    /* Tabelas */
-    .table-container {
-      background-color: var(--white);
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 20px;
-      margin-bottom: 30px;
-      overflow-x: auto;
-    }
-
-    .table-title {
-      font-size: 1.2rem;
+    /* --- Botões (mesma função, novo visual) --- */
+    button {
+      background: var(--cinza-escuro);
+      color: var(--branco);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
       font-weight: 600;
-      color: var(--secondary-color);
-      margin-bottom: 15px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      transition: background 0.3s;
     }
 
+    button:hover {
+      background: #1a252f;
+    }
+
+    /* --- Container da tabela (mesma estrutura) --- */
+    .container {
+      max-width: 1200px;
+      background: var(--branco);
+      padding: 25px;
+      margin: 0 auto 30px auto;
+      border-radius: 8px;
+      box-shadow: var(--sombra);
+    }
+
+    /* --- Tabelas (mesmo ID e classes) --- */
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      min-width: 600px;
+      margin-top: 20px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--sombra);
     }
 
     th, td {
+      border: 1px solid #ddd;
       padding: 12px 15px;
-      text-align: left;
-      border-bottom: 1px solid var(--medium-gray);
+      text-align: center;
     }
 
     th {
-      background-color: var(--secondary-color);
-      color: var(--white);
-      font-weight: 500;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      letter-spacing: 0.5px;
+      background-color: var(--cinza-escuro);
+      color: var(--branco);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
     }
 
     tr:hover {
-      background-color: rgba(231, 76, 60, 0.05);
+      background-color: #f1f1f1;
     }
 
-    /* Resumos */
-    .summary-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 30px;
-      margin-bottom: 30px;
+    /* --- Resumos (mesma estrutura original) --- */
+    .resumos-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    .summary-box {
-      background-color: var(--white);
-      border-radius: var(--border-radius);
-      box-shadow: var(--box-shadow);
-      padding: 20px;
+    .resumo-box {
+      flex: 1 1 400px;
+      max-width: 600px;
+      background: var(--branco);
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: var(--sombra);
       display: flex;
       flex-direction: column;
     }
 
-    .summary-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--secondary-color);
-      margin-bottom: 15px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .btn-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
     }
 
-    .summary-table-container {
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
-
-    .summary-table {
-      width: 100%;
-      min-width: 300px;
-    }
-
-    /* Responsividade */
+    /* --- Responsividade (igual ao original) --- */
     @media (max-width: 768px) {
-      .header-content {
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .control-panel {
+      .top-bar {
         flex-direction: column;
         align-items: stretch;
       }
 
-      .btn-group {
+      .file-group, .btn-group, .update-group {
+        width: 100%;
         justify-content: center;
       }
 
-      .summary-container {
-        grid-template-columns: 1fr;
+      .resumo-box {
+        flex: 1 1 100%;
       }
     }
 
     @media (max-width: 480px) {
       .main-header h1 {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
       }
 
-      .btn {
-        padding: 10px 15px;
-        font-size: 0.8rem;
+      button {
+        padding: 8px 12px;
       }
 
       th, td {
         padding: 8px 10px;
-        font-size: 0.9rem;
       }
-    }
-
-    /* Efeitos e Utilitários */
-    .pulse {
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-    }
-
-    .text-center {
-      text-align: center;
-    }
-
-    .mb-20 {
-      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <!-- Cabeçalho Moderno -->
+  <!-- Cabeçalho (mesma estrutura) -->
   <header class="main-header">
     <div class="header-content">
       <h1>TRATAMENTO PLANILHA DE ITENS | PERFECTA</h1>
@@ -334,116 +242,92 @@
     </div>
   </header>
 
-  <!-- Container Principal -->
-  <div class="app-container">
-    <!-- Painel de Controle -->
-    <section class="control-panel">
-      <div class="file-upload">
-        <label for="csvFile" class="file-upload-label">
-          <i class="fas fa-file-upload"></i>
-          Escolher Arquivo CSV
-        </label>
-        <input type="file" id="csvFile" accept=".csv,.txt">
-      </div>
-
-      <div class="btn-group">
-        <button onclick="exportCSV()" class="btn">
-          <i class="fas fa-file-csv"></i> Exportar CSV
-        </button>
-        <button onclick="exportXLS()" class="btn">
-          <i class="fas fa-file-excel"></i> Exportar XLS
-        </button>
-        <button onclick="copyProcessedTable()" class="btn">
-          <i class="fas fa-copy"></i> Copiar para Notion
-        </button>
-      </div>
-
-      <div class="color-input-group">
-        <label for="col9Color"><i class="fas fa-palette"></i></label>
-        <input type="text" id="col9Color" class="color-input" placeholder="Digite a cor (ex: peltre)">
-        <button onclick="updateCol9()" class="btn btn-primary">Atualizar</button>
-      </div>
-    </section>
-
-    <!-- Tabela Processada -->
-    <section class="table-container">
-      <h2 class="table-title">TABELA PROCESSADA</h2>
-      <div class="table-responsive">
-        <table id="resultTable">
-          <thead>
-            <tr>
-              <th>TIPO</th>
-              <th>ITENS</th>
-              <th>DESCRIÇÃO</th>
-              <th>AMBIENTE</th>
-              <th>COR</th>
-              <th>PRODUTO</th>
-              <th>CATEGORIA</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dados serão preenchidos dinamicamente -->
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Resumos -->
-    <section class="summary-container">
-      <div class="summary-box">
-        <h2 class="summary-title">TOTAL POR PRODUTO</h2>
-        <div class="summary-table-container">
-          <table id="summaryTable" class="summary-table">
-            <thead>
-              <tr>
-                <th>PRODUTO</th>
-                <th>QUANTIDADE</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="btn-group">
-          <button onclick="exportCSVSummary()" class="btn">
-            <i class="fas fa-file-csv"></i> Exportar
-          </button>
-          <button onclick="exportXLSSummary()" class="btn">
-            <i class="fas fa-file-excel"></i> Exportar
-          </button>
-          <button onclick="copySummaryTable()" class="btn">
-            <i class="fas fa-copy"></i> Copiar
-          </button>
-        </div>
-      </div>
-
-      <div class="summary-box">
-        <h2 class="summary-title">TOTAL POR CATEGORIA</h2>
-        <div class="summary-table-container">
-          <table id="summaryTable2" class="summary-table">
-            <thead>
-              <tr>
-                <th>CATEGORIA</th>
-                <th>QUANTIDADE</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <div class="btn-group">
-          <button onclick="exportCSVSummary2()" class="btn">
-            <i class="fas fa-file-csv"></i> Exportar
-          </button>
-          <button onclick="exportXLSSummary2()" class="btn">
-            <i class="fas fa-file-excel"></i> Exportar
-          </button>
-          <button onclick="copySummaryTable2()" class="btn">
-            <i class="fas fa-copy"></i> Copiar
-          </button>
-        </div>
-      </div>
-    </section>
+  <!-- Barra superior (mesmos IDs e classes) -->
+  <div class="top-bar">
+    <div class="file-group">
+      <input type="file" id="csvFile" accept=".csv,.txt">
+    </div>
+    <div class="btn-group">
+      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+    </div>
+    <div class="update-group">
+      <label for="col9Color" style="white-space:nowrap;">COR:</label>
+      <input type="text" id="col9Color" placeholder="Ex.: peltre">
+      <button onclick="updateCol9()">Confirmar</button>
+    </div>
   </div>
 
+  <!-- Container da tabela (mesma estrutura) -->
+  <div class="container">
+    <h2>TABELA PROCESSADA</h2>
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>TIPO</th>
+          <th>ITENS</th>
+          <th>DESCRIÇÃO</th>
+          <th>AMBIENTE</th>
+          <th>COR</th>
+          <th>PRODUTO</th>
+          <th>CATEGORIA</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dados serão preenchidos dinamicamente -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Resumos (mesma estrutura) -->
+  <div class="resumos-container">
+    <div class="resumo-box">
+      <h2>TOTAL PRODUTO</h2>
+      <div class="resumo-table-container">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>PRODUTO</th>
+              <th>QUANTIDADE</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="btn-container">
+        <div class="btn-group">
+          <button onclick="exportCSVSummary()">Exportar CSV</button>
+          <button onclick="exportXLSSummary()">Exportar XLS</button>
+          <button onclick="copySummaryTable()">Copiar (para Notion)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="resumo-box">
+      <h2>TOTAL CATEGORIA</h2>
+      <div class="resumo-table-container">
+        <table id="summaryTable2">
+          <thead>
+            <tr>
+              <th>CATEGORIA</th>
+              <th>QUANTIDADE</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="btn-container">
+        <div class="btn-group">
+          <button onclick="exportCSVSummary2()">Exportar CSV</button>
+          <button onclick="exportXLSSummary2()">Exportar XLS</button>
+          <button onclick="copySummaryTable2()">Copiar (para Notion)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  ==== JAVASCRIPT ORIGINAL (INTACTO) ==== -->
   <script>
     // Array com os dados processados (cada linha é um array)
     let processedData = [];
@@ -506,11 +390,6 @@
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-      
-      // Adiciona efeito visual de carregamento
-      const fileUploadLabel = document.querySelector('.file-upload-label');
-      fileUploadLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
-      
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
@@ -553,19 +432,9 @@
           updateResultTable();
           // Atualiza as tabelas de resumo
           updateSummaryTables();
-          
-          // Restaura o botão de upload
-          fileUploadLabel.innerHTML = '<i class="fas fa-check-circle"></i> Arquivo Processado';
-          setTimeout(() => {
-            fileUploadLabel.innerHTML = '<i class="fas fa-file-upload"></i> Escolher Arquivo CSV';
-          }, 2000);
         },
         error: function(error) {
           console.error("Erro ao processar arquivo:", error);
-          fileUploadLabel.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erro ao Processar';
-          setTimeout(() => {
-            fileUploadLabel.innerHTML = '<i class="fas fa-file-upload"></i> Escolher Arquivo CSV';
-          }, 2000);
         }
       });
     });
@@ -655,12 +524,6 @@
       
       // Atualiza a exibição da tabela
       updateResultTable();
-      
-      // Efeito visual de confirmação
-      colorInput.style.borderColor = '#e74c3c';
-      setTimeout(() => {
-        colorInput.style.borderColor = '';
-      }, 1000);
     }
 
     // Exporta a tabela processada para CSV
