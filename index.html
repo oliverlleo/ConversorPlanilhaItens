@@ -418,7 +418,8 @@
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9 (índice 5)
         let cellText = cell.textContent.trim();
-        if (cellText.toUpperCase().includes(selectedOption.toUpperCase())) {
+        // Verifica se o conteúdo da célula, sem espaços, é exatamente igual à opção (ignora case)
+        if (cellText.toUpperCase() === selectedOption.toUpperCase()) {
           cell.textContent = selectedOption;
           cell.style.backgroundColor = color;
         }
