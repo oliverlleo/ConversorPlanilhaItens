@@ -493,20 +493,24 @@
           totalItens = 0;
           
           results.data.forEach(function(row) {
-            // Considera que as colunas relevantes são:
-            // 1: TIPO, 3: ITENS, 4: DESCRIÇÃO, 5: AMBIENTE, 6: COR (pode ser vazia), 8: QUANTIDADE
-            // Aqui usamos índices: 0, 2, 3, 4, 5 e 7 (para quantidade)
-            if (row.length >= 8 && row[0] && !isNaN(row[7])) {
-              const tipo = row[0];
-              const itens = row[2];
+            // Agora, as colunas relevantes são:
+            // TIPO: coluna 2 (índice 1)
+            // ITENS: coluna 3 (índice 2)
+            // DESCRIÇÃO: coluna 4 (índice 3)
+            // AMBIENTE: coluna 5 (índice 4)
+            // QUANTIDADE: coluna 8 (índice 7)
+            // COR: coluna 9 (índice 8)
+            if (row.length >= 9 && row[1] && !isNaN(row[7].replace(",", "."))) {
+              const tipo      = row[1];
+              const itens     = row[2];
               const descricao = row[3];
-              const ambiente = row[4];
-              // Se o campo COR estiver vazio, tenta usar lastUpdatedColor se houver; caso contrário deixa em branco
-              const cor = row[5] || "";
-              const produto = getCodigo(descricao);
+              const ambiente  = row[4];
+              // Se o campo COR estiver vazio, mantém string vazia ou poderá ser alterado via updateCol9()
+              const cor       = row[8] || "";
+              const produto   = getCodigo(descricao);
               const categoria = getCodigo2(itens);
-              const quantidade = parseFloat(row[7].replace(",", "."));
-
+              const quantidade= parseFloat(row[7].replace(",", "."));
+              
               processedData.push([tipo, itens, descricao, ambiente, cor, produto, categoria, quantidade]);
 
               // Atualiza contagens para resumo
@@ -558,8 +562,7 @@
     // Atualiza os resumos (tabelas de resumo)
     function updateSummaryTables() {
       updateSummaryTable('summaryTable', summaryCounts, true);
-      updateSummaryTable('summaryTable2', summaryCounts, false); // ou summaryCounts2, se desejar
-      // Se quiser o resumo de categoria com dados de summaryCounts2, chame:
+      // Se deseja usar os dados de categoria, utiliza summaryCounts2
       updateSummaryTable('summaryTable2', summaryCounts2, false);
     }
 
@@ -568,7 +571,7 @@
       const tbody = document.querySelector(`#${tableId} tbody`);
       tbody.innerHTML = '';
       
-      const sortedItems = Object.entries(data).sort((a,b) => b[1] - a[1]);
+      const sortedItems = Object.entries(data).sort((a, b) => b[1] - a[1]);
       
       sortedItems.forEach(function([item, quantidade]) {
         const tr = document.createElement('tr');
@@ -690,8 +693,30 @@
     }
 
     // Copia resumo (produto) para área de transferência (Notion)
+    function copySummaryToClipboard(data, type, addTotal) {
+      if (Object.keys(data).length === 0) {
+        alert("Não há dados para copiar.");
+        return;
+      }
+      let text = type + "\tQUANTIDADE\n";
+      Object.entries(data).forEach(([item, quantidade]) => {
+        text += item + "\t" + quantidade + "\n";
+      });
+      if (addTotal && type === "PRODUTO") {
+        text += "TOTAL\t" + totalItens + "\n";
+      }
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Resumo de " + type.toLowerCase() + " copiado para a área de transferência (formato Notion)!");
+      }, () => {
+        alert("Erro ao copiar para a área de transferência. Tente novamente.");
+      });
+    }
+
     function copySummaryTable() {
       copySummaryToClipboard(summaryCounts, "PRODUTO", true);
+    }
+    function copySummaryTable2() {
+      copySummaryToClipboard(summaryCounts2, "CATEGORIA", false);
     }
 
     // Exporta resumo (categoria) para CSV
@@ -702,11 +727,6 @@
     // Exporta resumo (categoria) para XLS
     function exportXLSSummary2() {
       exportSummaryToXLS(summaryCounts2, "resumo_categoria.xls", false);
-    }
-
-    // Copia resumo (categoria) para área de transferência (Notion)
-    function copySummaryTable2() {
-      copySummaryToClipboard(summaryCounts2, "CATEGORIA", false);
     }
 
     // Função auxiliar para exportar resumo para CSV
@@ -746,29 +766,9 @@
       downloadFile(html, filename, "application/vnd.ms-excel");
     }
 
-    // Função auxiliar para copiar resumo para área de transferência
-    function copySummaryToClipboard(data, type, addTotal) {
-      if (Object.keys(data).length === 0) {
-        alert("Não há dados para copiar.");
-        return;
-      }
-      let text = type + "\tQUANTIDADE\n";
-      Object.entries(data).forEach(([item, quantidade]) => {
-        text += item + "\t" + quantidade + "\n";
-      });
-      if (addTotal && type === "PRODUTO") {
-        text += "TOTAL\t" + totalItens + "\n";
-      }
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Resumo de " + type.toLowerCase() + " copiado para a área de transferência (formato Notion)!");
-      }, () => {
-        alert("Erro ao copiar para a área de transferência. Tente novamente.");
-      });
-    }
-
     // Função de atualização da coluna COR
     // Na primeira vez, serão atualizadas as linhas cuja COR contenha "cey" ou "rob" (case-insensitive).
-    // Em atualizações subsequentes, atualizará apenas as linhas cuja COR seja igual (ignorando case) ao último valor atualizado.
+    // Em atualizações subsequentes, atualiza apenas as linhas cuja COR seja igual (ignorando case) ao último valor atualizado.
     function updateCol9() {
       const newColor = document.getElementById("col9Color").value.trim();
       if (!newColor) {
@@ -787,7 +787,7 @@
             processedData[i][4] = newColor;
           }
         } else {
-          // Atualizações posteriores: atualiza se o valor da COR for igual ao último valor atualizado
+          // Atualizações posteriores: atualiza se o valor da COR for igual ao último atualizado
           if (currentCor === lastUpdatedColor.toLowerCase()) {
             tbody.rows[i].cells[4].textContent = newColor;
             processedData[i][4] = newColor;
