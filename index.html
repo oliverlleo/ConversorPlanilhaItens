@@ -109,20 +109,23 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Tabela ficará vazia até o CSV ser carregado -->
+        <!-- Dados serão inseridos via CSV. Para teste, você pode incluir linhas temporárias.
+             Exemplo:
+        <tr>
+          <td>1</td><td>P01</td><td>ACM-PORTA</td><td>PORTA PIVOTANTE EM ACM</td>
+          <td>1700</td><td>PINTURA PRETO FOSCO - RAL9005F</td><td>ACM</td><td>Layer</td>
+        </tr>
+        <tr>
+          <td>2</td><td>AD-2</td><td>REH-JUNÇÃO 90º</td><td>FIXO 02 MODULOS CONJUGADOS EM 90° COM PERFIL NA ESQUINA</td>
+          <td>2955</td><td>MAR - CEY - CEY</td><td>Fixo</td><td>PVC</td>
+        </tr>
+        -->
       </tbody>
     </table>
   </div>
 
   <div class="update-panel">
     <h3>Atualizar Coluna 9</h3>
-    <div>
-      <label for="col9Option">Selecione a opção:</label>
-      <select id="col9Option">
-        <option value="MAR - CEY - CEY">MAR - CEY - CEY</option>
-        <option value="MAR - ROB - ROB">MAR - ROB - ROB</option>
-      </select>
-    </div>
     <div>
       <label for="col9Color">Cor (HEX ou nome):</label>
       <input type="text" id="col9Color" placeholder="#ff0000 ou red">
@@ -484,22 +487,19 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (índice 5 na Planilha 1) apenas alterando a cor de fundo,
-    // desde que o conteúdo (normalizado, sem espaços e em maiúsculas)
-    // contenha a opção selecionada
+    // Atualiza a Coluna 9 (índice 5) aplicando a cor escolhida, 
+    // sem alterar o texto existente, se o conteúdo (em caixa alta)
+    // contiver as substrings "CEY-" ou "ROB".
     function updateCol9() {
-      const selectedOption = document.getElementById("col9Option").value;
       const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
       const tbody = document.querySelector("#resultTable tbody");
-      const normalizedSelected = selectedOption.toUpperCase().replace(/\s/g, '');
       
-      // Verifica cada célula da Coluna 9
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9
-        let normalizedCell = cell.textContent.toUpperCase().replace(/\s/g, '');
-        if (normalizedCell.includes(normalizedSelected)) {
+        let cellText = cell.textContent.toUpperCase();
+        if (cellText.includes("CEY-") || cellText.includes("ROB")) {
           cell.style.backgroundColor = color;
-          console.log("Atualizou célula com:", cell.textContent);
+          console.log("Atualizou célula:", cell.textContent);
         }
       }
       alert("Atualização da Coluna 9 concluída!");
