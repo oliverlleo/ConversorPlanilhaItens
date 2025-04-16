@@ -230,6 +230,7 @@
       <img src="LOGO.png" alt="Logo Perfecta" class="logo">
     </div>
   </header>
+
   <!-- Barra superior -->
   <div class="top-bar">
     <div class="file-group">
@@ -242,10 +243,11 @@
     </div>
     <div class="update-group">
       <label for="col9Color" style="white-space:nowrap;">COR:</label>
-      <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
+      <input type="text" id="col9Color" placeholder="Ex.: peltre">
       <button onclick="updateCol9()">Confirmar</button>
     </div>
   </div>
+
   <div class="container">
     <h2>TABELA PROCESSADA</h2>
     <table id="resultTable">
@@ -265,6 +267,7 @@
       </tbody>
     </table>
   </div>
+
   <!-- Resumos Lado a Lado -->
   <div class="resumos-container">
     <div class="resumo-box">
@@ -288,6 +291,7 @@
         </div>
       </div>
     </div>
+
     <div class="resumo-box">
       <h2>TOTAL CATEGORIA</h2>
       <div class="resumo-table-container">
@@ -310,6 +314,7 @@
       </div>
     </div>
   </div>
+
   <script>
     let processedData = []; // Dados da Planilha 1
     const summaryCounts = {}; // Contagem para PRODUTO (função getCodigo)
@@ -319,6 +324,7 @@
     // Função para determinar o PRODUTO (a partir da DESCRIÇÃO – COLUNA 4)
     function getCodigo(texto) {
       const str = texto.toLowerCase();
+      // Mantenha todas as regras existentes, apenas adicionando a regra da "Oscilo":
       if (str.includes("fixo")) {
         return "Fixo";
       } else if (str.includes("porta de correr") && str.includes("persiana")) {
@@ -386,10 +392,14 @@
             // Acrescenta os valores derivados como PRODUTO e CATEGORIA
             const newRow = selected.concat(codigo, codigo2);
             processedData.push(newRow);
+            // Incrementa contagem de PRODUTO
             if (codigo) {
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
+            // Incrementa contagem de CATEGORIA
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
+
+            // Soma de itens (coluna 8 no CSV, índice 7)
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
@@ -445,10 +455,11 @@
       });
     }
 
-    // Função para copiar os dados das tabelas (excluindo os cabeçalhos)
+    // Função para copiar os dados das tabelas (SEM o cabeçalho)
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
+      // Começa do índice 1 (pulando o header)
       for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
         for (let cell of table.rows[i].cells) {
@@ -459,18 +470,21 @@
       return text;
     }
 
+    // Copia a Planilha 1 (resultTable)
     function copyProcessedTable() {
       const text = copyTableText("resultTable");
       navigator.clipboard.writeText(text).then(() => {
         alert("Planilha 1 copiada para a área de transferência!");
       });
     }
+    // Copia o Resumo 1 (summaryTable)
     function copySummaryTable() {
       const text = copyTableText("summaryTable");
       navigator.clipboard.writeText(text).then(() => {
         alert("Resumo 1 copiado para a área de transferência!");
       });
     }
+    // Copia o Resumo 2 (summaryTable2)
     function copySummaryTable2() {
       const text = copyTableText("summaryTable2");
       navigator.clipboard.writeText(text).then(() => {
@@ -629,24 +643,18 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna COR na Tabela Processada –
-    // Atualiza apenas as linhas cujo valor na coluna ITENS contenha "CEY" ou "ROB"
-    // O conteúdo da célula COR será substituído pelo novo texto informado pelo usuário.
+    // Atualiza TODA a Coluna COR na Tabela Processada para o texto informado
     function updateCol9() {
       const newCor = document.getElementById("col9Color").value.trim();
       if (!newCor) {
-        alert("Informe o novo texto (cor) para atualização.");
+        alert("Informe o texto (cor) para atualização.");
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
+      // Substitui o conteúdo da coluna 5 (índice 4) em todas as linhas
       for (let i = 0; i < processedData.length; i++) {
-        // Verifica se na coluna "ITENS" (índice 1) contém "CEY" ou "ROB" (case insensitive)
-        const itensValue = processedData[i][1] ? processedData[i][1].toLowerCase() : "";
-        if (itensValue.includes("cey") || itensValue.includes("rob")) {
-          let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
-          cell.textContent = newCor;
-          processedData[i][4] = newCor;
-        }
+        tbody.rows[i].cells[4].textContent = newCor;
+        processedData[i][4] = newCor;
       }
       alert("Atualização da Coluna COR concluída!");
     }
