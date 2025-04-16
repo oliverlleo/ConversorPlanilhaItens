@@ -241,13 +241,13 @@
     <table id="resultTable">
       <thead>
         <tr>
-          <th>COLUNA 2</th>
-          <th>COLUNA 3</th>
-          <th>COLUNA 4</th>
-          <th>COLUNA 5</th>
-          <th>COLUNA 9</th>
-          <th>NOVO CÓDIGO</th>
-          <th>NOVO CÓDIGO 2</th>
+          <th>TIPO</th>
+          <th>ITENS</th>
+          <th>DESCRIÇÃO</th>
+          <th>AMBIENTE</th>
+          <th>COR</th>
+          <th>PRODUTO</th>
+          <th>CATEGORIA</th>
         </tr>
       </thead>
       <tbody>
@@ -259,12 +259,12 @@
   <!-- Resumos lado a lado -->
   <div class="resumos-container">
     <div class="resumo-box">
-      <h2>TOTAL TIPOS</h2>
+      <h2>TOTAL PRODUTO</h2>
       <div class="resumo-table-container">
         <table id="summaryTable">
           <thead>
             <tr>
-              <th>CÓDIGO</th>
+              <th>PRODUTO</th>
               <th>QUANTIDADE</th>
             </tr>
           </thead>
@@ -281,12 +281,12 @@
     </div>
 
     <div class="resumo-box">
-      <h2>TOTAL PRODUTO</h2>
+      <h2>TOTAL CATEGORIA</h2>
       <div class="resumo-table-container">
         <table id="summaryTable2">
           <thead>
             <tr>
-              <th>TIPO</th>
+              <th>CATEGORIA</th>
               <th>QUANTIDADE</th>
             </tr>
           </thead>
@@ -305,11 +305,11 @@
 
   <script>
     let processedData = []; // Dados da Planilha 1
-    const summaryCounts = {}; // Contagem dos códigos derivados da Coluna 4 (Novo Código)
-    const summaryCounts2 = {}; // Contagem dos códigos derivados da Coluna 3 (Novo Código 2)
-    let totalItens = 0;     // Soma dos valores da 8ª coluna (índice 7 do CSV)
+    const summaryCounts = {}; // Contagem dos valores derivados da função getCodigo (PRODUTO)
+    const summaryCounts2 = {}; // Contagem dos valores derivados da função getCodigo2 (CATEGORIA)
+    let totalItens = 0;     // Soma dos valores da 8ª coluna do CSV
 
-    // Função para determinar o Novo Código (a partir da Coluna 4)
+    // Função para determinar o PRODUTO (a partir da DESCRIÇÃO -> COLUNA 4)
     function getCodigo(texto) {
       const str = texto.toLowerCase();
       if (str.includes("fixo")) {
@@ -340,7 +340,7 @@
       return "";
     }
 
-    // Função para determinar o Novo Código 2 (a partir da Coluna 3)
+    // Função para determinar a CATEGORIA (a partir dos ITENS -> COLUNA 3)
     function getCodigo2(texto) {
       const str = texto.toLowerCase();
       if (str.includes("gol")) {
@@ -362,7 +362,7 @@
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
-          // Zera contagens anteriores
+          // Zera as contagens anteriores
           for (let key in summaryCounts) { delete summaryCounts[key]; }
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
@@ -374,14 +374,15 @@
             const selected = [row[1], row[2], row[3], row[4], row[8]];
             const codigo = getCodigo(row[3] || "");
             const codigo2 = getCodigo2(row[2] || "");
+            // Acrescenta os valores derivados como PRODUTO e CATEGORIA
             const newRow = selected.concat(codigo, codigo2);
             processedData.push(newRow);
-            // Atualiza contagens
+            // Atualiza as contagens para os resumos
             if (codigo) {
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-            // Soma a coluna 8 (índice 7 do CSV) se houver
+            // Soma a coluna 8 do CSV, se aplicável
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
@@ -397,7 +398,7 @@
       });
     });
 
-    // Renderiza a Planilha 1
+    // Renderiza a Tabela Processada
     function renderResultTable() {
       const tbody = document.querySelector("#resultTable tbody");
       tbody.innerHTML = "";
@@ -412,7 +413,7 @@
       });
     }
 
-    // Renderiza a Tabela Resumo (Coluna 4 - Novo Código)
+    // Renderiza o Resumo para PRODUTO (resultado da função getCodigo)
     function renderSummaryTable() {
       const tbody = document.querySelector("#summaryTable tbody");
       tbody.innerHTML = "";
@@ -426,7 +427,7 @@
       tbody.appendChild(trTotal);
     }
 
-    // Renderiza a Tabela Resumo 2 (Coluna 3 - Novo Código 2)
+    // Renderiza o Resumo para CATEGORIA (resultado da função getCodigo2)
     function renderSummaryTable2() {
       const tbody = document.querySelector("#summaryTable2 tbody");
       tbody.innerHTML = "";
@@ -437,11 +438,11 @@
       });
     }
 
-    // Função para copiar o conteúdo das tabelas (sem os cabeçalhos)
+    // Função para copiar o conteúdo das tabelas (excluindo o cabeçalho)
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
-      // Começa a partir da segunda linha (pula o cabeçalho)
+      // Copia a partir da segunda linha (pula o cabeçalho)
       for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
         for (let cell of table.rows[i].cells) {
@@ -473,8 +474,7 @@
     // Exportar tabelas - CSV/XLS
     function exportCSV() {
       const header = [
-        "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5",
-        "Coluna 9", "Novo Código", "Novo Código 2"
+        "TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"
       ];
       let csvContent = header.join(",") + "\n";
       processedData.forEach(row => {
@@ -495,13 +495,13 @@
         <table border="1">
           <thead>
             <tr>
-              <th>Coluna 2</th>
-              <th>Coluna 3</th>
-              <th>Coluna 4</th>
-              <th>Coluna 5</th>
-              <th>Coluna 9</th>
-              <th>Novo Código</th>
-              <th>Novo Código 2</th>
+              <th>TIPO</th>
+              <th>ITENS</th>
+              <th>DESCRIÇÃO</th>
+              <th>AMBIENTE</th>
+              <th>COR</th>
+              <th>PRODUTO</th>
+              <th>CATEGORIA</th>
             </tr>
           </thead>
           <tbody>`;
@@ -523,7 +523,7 @@
       document.body.removeChild(a);
     }
     function exportCSVSummary() {
-      const header = ["Código", "Quantidade"];
+      const header = ["PRODUTO", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
       const rows = document.querySelectorAll("#summaryTable tbody tr");
       rows.forEach(row => {
@@ -546,8 +546,8 @@
         <table border="1">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Quantidade</th>
+              <th>PRODUTO</th>
+              <th>QUANTIDADE</th>
             </tr>
           </thead>
           <tbody>`;
@@ -571,7 +571,7 @@
       document.body.removeChild(a);
     }
     function exportCSVSummary2() {
-      const header = ["Tipo", "Quantidade"];
+      const header = ["CATEGORIA", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
       const rows = document.querySelectorAll("#summaryTable2 tbody tr");
       rows.forEach(row => {
@@ -594,8 +594,8 @@
         <table border="1">
           <thead>
             <tr>
-              <th>Tipo</th>
-              <th>Quantidade</th>
+              <th>CATEGORIA</th>
+              <th>QUANTIDADE</th>
             </tr>
           </thead>
           <tbody>`;
@@ -619,7 +619,7 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (agora na posição 5 - índice 4) na Planilha 1
+    // Atualiza a Coluna COR na Planilha Processada (coluna de índice 4)
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
@@ -627,9 +627,9 @@
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
-      // Atualiza cada célula da coluna 9 e também o array processedData
+      // Atualiza cada célula da coluna COR e também o array processedData
       for (let i = 0; i < tbody.rows.length; i++) {
-        let cell = tbody.rows[i].cells[4]; // Nova posição da Coluna 9
+        let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
           cell.textContent = newColorText;
@@ -639,7 +639,7 @@
           console.log("Atualizou célula:", cell.textContent);
         }
       }
-      alert("Atualização da Coluna 9 concluída!");
+      alert("Atualização da Coluna COR concluída!");
     }
   </script>
 </body>
