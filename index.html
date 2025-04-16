@@ -2,209 +2,331 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>TRATAMENTO PLANILHA ITENS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRATAMENTO PLANILHA ITENS | PERFECTA</title>
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <!-- Fonte Roboto -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+  <!-- Fonte Montserrat (mais moderna) -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Ícones do Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    .resumo-container {
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
+    :root {
+      --primary-color: #e74c3c;
+      --primary-dark: #c0392b;
+      --secondary-color: #2c3e50;
+      --light-gray: #f8f9fa;
+      --medium-gray: #e9ecef;
+      --dark-gray: #343a40;
+      --text-color: #495057;
+      --white: #ffffff;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --transition: all 0.3s ease;
     }
-    #resultTable {
-      margin: 0 auto;
-      display: table;
-    }
-    /* Reset Básico */
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #f5f7fa;
-      color: #333;
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--text-color);
       line-height: 1.6;
+      padding: 0;
+    }
+
+    /* Layout Container */
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
       padding: 20px;
     }
-    h1, h2, h3 {
-      text-transform: uppercase;
-      text-align: center;
-    }
-    /* Cabeçalho Minimalista */
+
+    /* Header Moderno */
     .main-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 10px;
-      border-bottom: 2px solid #e74c3c;
+      background-color: var(--white);
+      padding: 15px 0;
+      box-shadow: var(--box-shadow);
+      margin-bottom: 30px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
+
     .header-content {
       display: flex;
       align-items: center;
-      gap: 20px;
+      justify-content: space-between;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
     }
+
     .main-header h1 {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #333;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--secondary-color);
       margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
+
     .logo {
-      height: 50px;
+      height: 40px;
+      transition: var(--transition);
     }
-    /* Barra superior */
-    .top-bar {
-      max-width: 1200px;
-      background: #fff;
-      margin: 0 auto 20px auto;
+
+    .logo:hover {
+      transform: scale(1.05);
+    }
+
+    /* Painel de Controle */
+    .control-panel {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
       display: flex;
       flex-wrap: wrap;
+      gap: 15px;
       align-items: center;
-      justify-content: space-between;
+    }
+
+    .file-upload {
+      position: relative;
+      flex: 1 1 300px;
+    }
+
+    .file-upload input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .file-upload-label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+
+    .file-upload-label:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn {
+      background-color: var(--secondary-color);
+      color: var(--white);
+      border: none;
+      padding: 12px 20px;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .btn:hover {
+      background-color: var(--dark-gray);
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
       gap: 10px;
     }
-    .file-group, .btn-group, .update-group {
+
+    .color-input-group {
       display: flex;
       align-items: center;
       gap: 10px;
+      flex: 1 1 250px;
     }
-    .file-group input[type="file"] {
-      min-width: 200px;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
-      cursor: pointer;
-      font-size: 14px;
+
+    .color-input {
+      padding: 12px 15px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      flex: 1;
+      transition: var(--transition);
     }
-    .file-group input[type="file"]::-webkit-file-upload-button {
-      visibility: hidden;
-    }
-    .file-group input[type="file"]::before {
-      content: 'Escolher arquivo';
-      display: inline-block;
-      background: #007BFF;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-    .file-group input[type="file"]:hover::before {
-      background: #0056b3;
-    }
-    .file-group input[type="file"]:focus {
+
+    .color-input:focus {
       outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
     }
-    button {
-      background: #2c2c2c;
-      color: #fff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #1a1a1a;
-    }
-    .container {
-      max-width: 1200px;
-      background: #fff;
+
+    /* Tabelas */
+    .table-container {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
       padding: 20px;
-      margin: 0 auto 20px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+      overflow-x: auto;
     }
+
+    .table-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-bottom: 15px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
     table {
       width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
+      border-collapse: collapse;
       margin-top: 10px;
-      overflow-x: auto;
-      display: block;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 600px;
     }
+
     th, td {
-      border: 1px solid #ddd;
-      padding: 12px 8px;
-      text-align: center;
-      word-break: break-word;
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid var(--medium-gray);
     }
+
     th {
-      background: #f0f0f0;
+      background-color: var(--secondary-color);
+      color: var(--white);
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
     }
-    .resumos-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
+
+    tr:hover {
+      background-color: rgba(231, 76, 60, 0.05);
     }
-    .resumo-box {
-      flex: 1 1 400px;
-      max-width: 600px;
-      background: #fff;
+
+    /* Resumos */
+    .summary-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+      margin-bottom: 30px;
+    }
+
+    .summary-box {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
     }
-    .btn-container {
-      margin-top: auto;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding-top: 20px;
+
+    .summary-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary-color);
+      margin-bottom: 15px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    .resumo-table-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
+
+    .summary-table-container {
+      margin-bottom: 20px;
+      overflow-x: auto;
     }
-    .resumo-table-container table {
-      margin: 0 auto;
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      width: auto;
-      display: inline-block;
+
+    .summary-table {
+      width: 100%;
+      min-width: 300px;
     }
-    @media (max-width: 600px) {
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .control-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn-group {
+        justify-content: center;
+      }
+
+      .summary-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-header h1 {
+        font-size: 1.2rem;
+      }
+
+      .btn {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+      }
+
       th, td {
-        padding: 8px 4px;
+        padding: 8px 10px;
+        font-size: 0.9rem;
       }
-      button {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-      .resumo-table-container {
-        overflow-x: auto;
-      }
-      .resumo-table-container table {
-        width: 100%;
-        margin: 10px 0;
-        display: table;
-      }
+    }
+
+    /* Efeitos e Utilitários */
+    .pulse {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(231, 76, 60, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .mb-20 {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
-  <!-- Cabeçalho -->
+  <!-- Cabeçalho Moderno -->
   <header class="main-header">
     <div class="header-content">
       <h1>TRATAMENTO PLANILHA DE ITENS | PERFECTA</h1>
@@ -212,88 +334,114 @@
     </div>
   </header>
 
-  <!-- Barra superior -->
-  <div class="top-bar">
-    <div class="file-group">
-      <input type="file" id="csvFile" accept=".csv,.txt">
-    </div>
-    <div class="btn-group">
-      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
-      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
-      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
-    </div>
-    <div class="update-group">
-      <label for="col9Color" style="white-space:nowrap;">COR:</label>
-      <input type="text" id="col9Color" placeholder="Ex.: peltre">
-      <button onclick="updateCol9()">Confirmar</button>
-    </div>
-  </div>
+  <!-- Container Principal -->
+  <div class="app-container">
+    <!-- Painel de Controle -->
+    <section class="control-panel">
+      <div class="file-upload">
+        <label for="csvFile" class="file-upload-label">
+          <i class="fas fa-file-upload"></i>
+          Escolher Arquivo CSV
+        </label>
+        <input type="file" id="csvFile" accept=".csv,.txt">
+      </div>
 
-  <div class="container">
-    <h2>TABELA PROCESSADA</h2>
-    <table id="resultTable">
-      <thead>
-        <tr>
-          <th>TIPO</th>
-          <th>ITENS</th>
-          <th>DESCRIÇÃO</th>
-          <th>AMBIENTE</th>
-          <th>COR</th>
-          <th>PRODUTO</th>
-          <th>CATEGORIA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dados serão preenchidos dinamicamente -->
-      </tbody>
-    </table>
-  </div>
+      <div class="btn-group">
+        <button onclick="exportCSV()" class="btn">
+          <i class="fas fa-file-csv"></i> Exportar CSV
+        </button>
+        <button onclick="exportXLS()" class="btn">
+          <i class="fas fa-file-excel"></i> Exportar XLS
+        </button>
+        <button onclick="copyProcessedTable()" class="btn">
+          <i class="fas fa-copy"></i> Copiar para Notion
+        </button>
+      </div>
 
-  <!-- Resumos Lado a Lado -->
-  <div class="resumos-container">
-    <div class="resumo-box">
-      <h2>TOTAL PRODUTO</h2>
-      <div class="resumo-table-container">
-        <table id="summaryTable">
+      <div class="color-input-group">
+        <label for="col9Color"><i class="fas fa-palette"></i></label>
+        <input type="text" id="col9Color" class="color-input" placeholder="Digite a cor (ex: peltre)">
+        <button onclick="updateCol9()" class="btn btn-primary">Atualizar</button>
+      </div>
+    </section>
+
+    <!-- Tabela Processada -->
+    <section class="table-container">
+      <h2 class="table-title">TABELA PROCESSADA</h2>
+      <div class="table-responsive">
+        <table id="resultTable">
           <thead>
             <tr>
+              <th>TIPO</th>
+              <th>ITENS</th>
+              <th>DESCRIÇÃO</th>
+              <th>AMBIENTE</th>
+              <th>COR</th>
               <th>PRODUTO</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="btn-container">
-        <div class="btn-group">
-          <button onclick="exportCSVSummary()">Exportar CSV</button>
-          <button onclick="exportXLSSummary()">Exportar XLS</button>
-          <button onclick="copySummaryTable()">Copiar (para Notion)</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="resumo-box">
-      <h2>TOTAL CATEGORIA</h2>
-      <div class="resumo-table-container">
-        <table id="summaryTable2">
-          <thead>
-            <tr>
               <th>CATEGORIA</th>
-              <th>QUANTIDADE</th>
             </tr>
           </thead>
-          <tbody></tbody>
+          <tbody>
+            <!-- Dados serão preenchidos dinamicamente -->
+          </tbody>
         </table>
       </div>
-      <div class="btn-container">
+    </section>
+
+    <!-- Resumos -->
+    <section class="summary-container">
+      <div class="summary-box">
+        <h2 class="summary-title">TOTAL POR PRODUTO</h2>
+        <div class="summary-table-container">
+          <table id="summaryTable" class="summary-table">
+            <thead>
+              <tr>
+                <th>PRODUTO</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
         <div class="btn-group">
-          <button onclick="exportCSVSummary2()">Exportar CSV</button>
-          <button onclick="exportXLSSummary2()">Exportar XLS</button>
-          <button onclick="copySummaryTable2()">Copiar (para Notion)</button>
+          <button onclick="exportCSVSummary()" class="btn">
+            <i class="fas fa-file-csv"></i> Exportar
+          </button>
+          <button onclick="exportXLSSummary()" class="btn">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+          <button onclick="copySummaryTable()" class="btn">
+            <i class="fas fa-copy"></i> Copiar
+          </button>
         </div>
       </div>
-    </div>
+
+      <div class="summary-box">
+        <h2 class="summary-title">TOTAL POR CATEGORIA</h2>
+        <div class="summary-table-container">
+          <table id="summaryTable2" class="summary-table">
+            <thead>
+              <tr>
+                <th>CATEGORIA</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="btn-group">
+          <button onclick="exportCSVSummary2()" class="btn">
+            <i class="fas fa-file-csv"></i> Exportar
+          </button>
+          <button onclick="exportXLSSummary2()" class="btn">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+          <button onclick="copySummaryTable2()" class="btn">
+            <i class="fas fa-copy"></i> Copiar
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -358,6 +506,11 @@
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
+      
+      // Adiciona efeito visual de carregamento
+      const fileUploadLabel = document.querySelector('.file-upload-label');
+      fileUploadLabel.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+      
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
@@ -365,299 +518,334 @@
           for (let key in summaryCounts) { delete summaryCounts[key]; }
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
-          
-          const rows = results.data;
-          rows.forEach(row => {
-            if (!row || row.length < 9) return;  // Ignora linhas com dados insuficientes
-            // Seleciona as colunas desejadas: 2,3,4,5,9 (índices: 1,2,3,4,8)
-            const selected = [row[1], row[2], row[3], row[4], row[8]];
-            // Gera PRODUTO e CATEGORIA
-            const codigo = getCodigo(row[3] || "");
-            const codigo2 = getCodigo2(row[2] || "");
-            const newRow = selected.concat(codigo, codigo2);
-            processedData.push(newRow);
-  
-            // Incrementa as contagens
-            if (codigo) {
-              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
-            }
-            summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-  
-            // Soma a quantidade (coluna 8 do CSV, índice 7)
-            let quantidade = Number(row[7].replace(",", "."));
-            if (!isNaN(quantidade)) {
+
+          // Processa cada linha do CSV
+          results.data.forEach(function(row) {
+            if (row.length >= 8 && row[0] && !isNaN(row[7])) {
+              const tipo = row[0];
+              const itens = row[2];
+              const descricao = row[3];
+              const ambiente = row[4];
+              const cor = row[5] || lastUpdatedColor || "";
+              const produto = getCodigo(descricao);
+              const categoria = getCodigo2(itens);
+              const quantidade = parseFloat(row[7]);
+
+              // Adiciona aos dados processados
+              processedData.push([tipo, itens, descricao, ambiente, cor, produto, categoria, quantidade]);
+
+              // Atualiza contagem para resumo por produto
+              if (produto) {
+                summaryCounts[produto] = (summaryCounts[produto] || 0) + quantidade;
+              }
+
+              // Atualiza contagem para resumo por categoria
+              if (categoria) {
+                summaryCounts2[categoria] = (summaryCounts2[categoria] || 0) + quantidade;
+              }
+
+              // Soma ao total de itens
               totalItens += quantidade;
             }
           });
-          renderResultTable();
-          renderSummaryTable();
-          renderSummaryTable2();
+
+          // Atualiza a tabela principal
+          updateResultTable();
+          // Atualiza as tabelas de resumo
+          updateSummaryTables();
+          
+          // Restaura o botão de upload
+          fileUploadLabel.innerHTML = '<i class="fas fa-check-circle"></i> Arquivo Processado';
+          setTimeout(() => {
+            fileUploadLabel.innerHTML = '<i class="fas fa-file-upload"></i> Escolher Arquivo CSV';
+          }, 2000);
         },
-        error: function(err) {
-          alert("Erro ao ler o CSV: " + err.message);
+        error: function(error) {
+          console.error("Erro ao processar arquivo:", error);
+          fileUploadLabel.innerHTML = '<i class="fas fa-exclamation-circle"></i> Erro ao Processar';
+          setTimeout(() => {
+            fileUploadLabel.innerHTML = '<i class="fas fa-file-upload"></i> Escolher Arquivo CSV';
+          }, 2000);
         }
       });
     });
-  
-    // Renderiza a Tabela Processada
-    function renderResultTable() {
-      const tbody = document.querySelector("#resultTable tbody");
-      tbody.innerHTML = "";
-      processedData.forEach(row => {
-        const tr = document.createElement("tr");
-        row.forEach(col => {
-          const td = document.createElement("td");
-          td.textContent = col;
+
+    // Atualiza a tabela principal com os dados processados
+    function updateResultTable() {
+      const tbody = document.querySelector('#resultTable tbody');
+      tbody.innerHTML = '';
+
+      processedData.forEach(function(row) {
+        const tr = document.createElement('tr');
+        
+        // Adiciona as células com os dados processados
+        for (let i = 0; i < 7; i++) { // Apenas as 7 primeiras colunas (a 8ª é a quantidade)
+          const td = document.createElement('td');
+          td.textContent = row[i] || '';
           tr.appendChild(td);
-        });
-        tbody.appendChild(tr);
-      });
-    }
-  
-    // Renderiza o Resumo para PRODUTO
-    function renderSummaryTable() {
-      const tbody = document.querySelector("#summaryTable tbody");
-      tbody.innerHTML = "";
-      Object.keys(summaryCounts).sort().forEach(key => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${key}</td><td>${summaryCounts[key]}</td>`;
-        tbody.appendChild(tr);
-      });
-      const trTotal = document.createElement("tr");
-      trTotal.innerHTML = `<td><strong>Total de Itens</strong></td><td><strong>${totalItens}</strong></td>`;
-      tbody.appendChild(trTotal);
-    }
-  
-    // Renderiza o Resumo para CATEGORIA
-    function renderSummaryTable2() {
-      const tbody = document.querySelector("#summaryTable2 tbody");
-      tbody.innerHTML = "";
-      Object.keys(summaryCounts2).sort().forEach(key => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${key}</td><td>${summaryCounts2[key]}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-  
-    // Função para copiar o conteúdo da tabela sem o cabeçalho (para Notion)
-    function copyTableText(tableId) {
-      const table = document.getElementById(tableId);
-      let text = "";
-      // Copia a partir da linha 1 (pulando cabeçalho)
-      for (let i = 1; i < table.rows.length; i++) {
-        let rowText = [];
-        for (let cell of table.rows[i].cells) {
-          rowText.push(cell.innerText);
         }
-        text += rowText.join("\t") + "\n";
+        
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Atualiza as tabelas de resumo
+    function updateSummaryTables() {
+      updateSummaryTable('summaryTable', summaryCounts);
+      updateSummaryTable('summaryTable2', summaryCounts2);
+    }
+
+    // Atualiza uma tabela de resumo específica
+    function updateSummaryTable(tableId, data) {
+      const tbody = document.querySelector(`#${tableId} tbody`);
+      tbody.innerHTML = '';
+
+      // Ordena os itens por quantidade (decrescente)
+      const sortedItems = Object.entries(data).sort((a, b) => b[1] - a[1]);
+
+      sortedItems.forEach(function([item, quantidade]) {
+        const tr = document.createElement('tr');
+        
+        const tdItem = document.createElement('td');
+        tdItem.textContent = item;
+        
+        const tdQuantidade = document.createElement('td');
+        tdQuantidade.textContent = quantidade;
+        
+        tr.appendChild(tdItem);
+        tr.appendChild(tdQuantidade);
+        tbody.appendChild(tr);
+      });
+
+      // Adiciona linha de total se for a tabela de produtos
+      if (tableId === 'summaryTable') {
+        const trTotal = document.createElement('tr');
+        trTotal.style.fontWeight = 'bold';
+        
+        const tdTotalLabel = document.createElement('td');
+        tdTotalLabel.textContent = 'TOTAL';
+        
+        const tdTotalValue = document.createElement('td');
+        tdTotalValue.textContent = totalItens;
+        
+        trTotal.appendChild(tdTotalLabel);
+        trTotal.appendChild(tdTotalValue);
+        tbody.appendChild(trTotal);
       }
-      return text;
     }
-  
-    function copyProcessedTable() {
-      const text = copyTableText("resultTable");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Planilha 1 copiada para a área de transferência!");
-      });
-    }
-    function copySummaryTable() {
-      const text = copyTableText("summaryTable");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Resumo 1 copiado para a área de transferência!");
-      });
-    }
-    function copySummaryTable2() {
-      const text = copyTableText("summaryTable2");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Resumo 2 copiado para a área de transferência!");
-      });
-    }
-  
-    // Exporta o CSV da Tabela Processada
-    function exportCSV() {
-      const header = ["TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"];
-      let csvContent = header.join(",") + "\n";
-      processedData.forEach(row => {
-        const line = row.map(item => `"${item}"`).join(",");
-        csvContent += line + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "dados_processados.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Exporta para XLS da Tabela Processada
-    function exportXLS() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>TIPO</th>
-              <th>ITENS</th>
-              <th>DESCRIÇÃO</th>
-              <th>AMBIENTE</th>
-              <th>COR</th>
-              <th>PRODUTO</th>
-              <th>CATEGORIA</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      processedData.forEach(row => {
-        tableHTML += "<tr>";
-        row.forEach(item => {
-          tableHTML += "<td>" + item + "</td>";
-        });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "dados_processados.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Exporta Resumo 1 em CSV
-    function exportCSVSummary() {
-      const header = ["PRODUTO", "QUANTIDADE"];
-      let csvContent = header.join(",") + "\n";
-      const rows = document.querySelectorAll("#summaryTable tbody tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        let arr = [];
-        cols.forEach(td => arr.push(`"${td.innerText}"`));
-        csvContent += arr.join(",") + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Exporta Resumo 1 em XLS
-    function exportXLSSummary() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>PRODUTO</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      const rows = document.querySelectorAll("#summaryTable tbody tr");
-      rows.forEach(row => {
-        tableHTML += "<tr>";
-        const cells = row.querySelectorAll("td");
-        cells.forEach(cell => {
-          tableHTML += "<td>" + cell.innerText + "</td>";
-        });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Exporta Resumo 2 em CSV
-    function exportCSVSummary2() {
-      const header = ["CATEGORIA", "QUANTIDADE"];
-      let csvContent = header.join(",") + "\n";
-      const rows = document.querySelectorAll("#summaryTable2 tbody tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        let arr = [];
-        cols.forEach(td => arr.push(`"${td.innerText}"`));
-        csvContent += arr.join(",") + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados2.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Exporta Resumo 2 em XLS
-    function exportXLSSummary2() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>CATEGORIA</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      const rows = document.querySelectorAll("#summaryTable2 tbody tr");
-      rows.forEach(row => {
-        tableHTML += "<tr>";
-        const cells = row.querySelectorAll("td");
-        cells.forEach(cell => {
-          tableHTML += "<td>" + cell.innerText + "</td>";
-        });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados2.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  
-    // Função updateCol9 atualizada:
-    // Na primeira vez, atualiza linhas cuja coluna COR contenha "cey" ou "rob".
-    // Em atualizações subsequentes, atualiza somente as linhas cuja COR for igual (case-insensitive) ao último valor atualizado.
+
+    // Atualiza a coluna de cor (COLUNA 9) com o valor digitado
     function updateCol9() {
-      const newCor = document.getElementById("col9Color").value.trim();
-      if (!newCor) {
-        alert("Informe o texto (cor) para atualização.");
+      const colorInput = document.getElementById('col9Color');
+      const newColor = colorInput.value.trim();
+      
+      if (!newColor) {
+        alert('Por favor, digite um valor para a cor.');
         return;
       }
-      const tbody = document.querySelector("#resultTable tbody");
-      for (let i = 0; i < processedData.length; i++) {
-        let currentCor = processedData[i][4] ? processedData[i][4].toLowerCase() : "";
-        if (lastUpdatedColor === null) {
-          // Primeira atualização: verifica se contém "cey" ou "rob"
-          if (currentCor.includes("cey") || currentCor.includes("rob")) {
-            tbody.rows[i].cells[4].textContent = newCor;
-            processedData[i][4] = newCor;
-          }
-        } else {
-          // Atualizações subsequentes: atualiza se a célula for igual ao último valor atualizado (ignorando case)
-          if (currentCor === lastUpdatedColor.toLowerCase()) {
-            tbody.rows[i].cells[4].textContent = newCor;
-            processedData[i][4] = newCor;
-          }
+      
+      lastUpdatedColor = newColor;
+      
+      // Atualiza a cor em todos os dados processados onde a cor estava vazia
+      processedData.forEach(function(row) {
+        if (!row[4] || row[4] === lastUpdatedColor) {
+          row[4] = newColor;
         }
+      });
+      
+      // Atualiza a exibição da tabela
+      updateResultTable();
+      
+      // Efeito visual de confirmação
+      colorInput.style.borderColor = '#e74c3c';
+      setTimeout(() => {
+        colorInput.style.borderColor = '';
+      }, 1000);
+    }
+
+    // Exporta a tabela processada para CSV
+    function exportCSV() {
+      if (processedData.length === 0) {
+        alert('Não há dados para exportar.');
+        return;
       }
-      // Define o novo valor como o último valor atualizado para futuras atualizações
-      lastUpdatedColor = newCor;
-      alert("Atualização da Coluna COR concluída!");
+      
+      // Cria cabeçalhos
+      const headers = ['TIPO', 'ITENS', 'DESCRIÇÃO', 'AMBIENTE', 'COR', 'PRODUTO', 'CATEGORIA', 'QUANTIDADE'];
+      const data = [headers, ...processedData];
+      
+      const csv = Papa.unparse(data);
+      downloadFile(csv, 'planilha_processada.csv', 'text/csv;charset=utf-8;');
+    }
+
+    // Exporta a tabela processada para XLS
+    function exportXLS() {
+      if (processedData.length === 0) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+      
+      // Cria cabeçalhos
+      const headers = ['TIPO', 'ITENS', 'DESCRIÇÃO', 'AMBIENTE', 'COR', 'PRODUTO', 'CATEGORIA', 'QUANTIDADE'];
+      const data = [headers, ...processedData];
+      
+      let csv = Papa.unparse(data);
+      
+      // Converter CSV para XLS
+      let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Planilha1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>';
+      
+      data.forEach(function(row) {
+        html += '<tr>';
+        row.forEach(function(cell) {
+          html += '<td>' + (cell || '') + '</td>';
+        });
+        html += '</tr>';
+      });
+      
+      html += '</table></body></html>';
+      
+      downloadFile(html, 'planilha_processada.xls', 'application/vnd.ms-excel');
+    }
+
+    // Copia a tabela processada para área de transferência (formato para Notion)
+    function copyProcessedTable() {
+      if (processedData.length === 0) {
+        alert('Não há dados para copiar.');
+        return;
+      }
+      
+      let text = 'TIPO\tITENS\tDESCRIÇÃO\tAMBIENTE\tCOR\tPRODUTO\tCATEGORIA\tQUANTIDADE\n';
+      
+      processedData.forEach(function(row) {
+        text += row.join('\t') + '\n';
+      });
+      
+      navigator.clipboard.writeText(text).then(function() {
+        alert('Dados copiados para a área de transferência no formato para Notion!');
+      }, function() {
+        alert('Erro ao copiar para a área de transferência. Por favor, tente novamente.');
+      });
+    }
+
+    // Exporta a tabela de resumo (produto) para CSV
+    function exportCSVSummary() {
+      exportSummaryToCSV(summaryCounts, 'resumo_produto.csv');
+    }
+
+    // Exporta a tabela de resumo (produto) para XLS
+    function exportXLSSummary() {
+      exportSummaryToXLS(summaryCounts, 'resumo_produto.xls');
+    }
+
+    // Copia a tabela de resumo (produto) para área de transferência (formato para Notion)
+    function copySummaryTable() {
+      copySummaryToClipboard(summaryCounts, 'PRODUTO');
+    }
+
+    // Exporta a tabela de resumo (categoria) para CSV
+    function exportCSVSummary2() {
+      exportSummaryToCSV(summaryCounts2, 'resumo_categoria.csv');
+    }
+
+    // Exporta a tabela de resumo (categoria) para XLS
+    function exportXLSSummary2() {
+      exportSummaryToXLS(summaryCounts2, 'resumo_categoria.xls');
+    }
+
+    // Copia a tabela de resumo (categoria) para área de transferência (formato para Notion)
+    function copySummaryTable2() {
+      copySummaryToClipboard(summaryCounts2, 'CATEGORIA');
+    }
+
+    // Função auxiliar para exportar resumo para CSV
+    function exportSummaryToCSV(data, filename) {
+      if (Object.keys(data).length === 0) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+      
+      const headers = ['ITEM', 'QUANTIDADE'];
+      const rows = Object.entries(data).map(([item, quantidade]) => [item, quantidade]);
+      
+      // Adiciona total se for o resumo de produtos
+      if (filename.includes('produto')) {
+        rows.push(['TOTAL', totalItens]);
+      }
+      
+      const csv = Papa.unparse([headers, ...rows]);
+      downloadFile(csv, filename, 'text/csv;charset=utf-8;');
+    }
+
+    // Função auxiliar para exportar resumo para XLS
+    function exportSummaryToXLS(data, filename) {
+      if (Object.keys(data).length === 0) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+      
+      const headers = ['ITEM', 'QUANTIDADE'];
+      const rows = Object.entries(data).map(([item, quantidade]) => [item, quantidade]);
+      
+      // Adiciona total se for o resumo de produtos
+      if (filename.includes('produto')) {
+        rows.push(['TOTAL', totalItens]);
+      }
+      
+      let html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Planilha1</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>';
+      
+      // Adiciona cabeçalhos
+      html += '<tr><th>' + headers.join('</th><th>') + '</th></tr>';
+      
+      // Adiciona linhas de dados
+      rows.forEach(function(row) {
+        html += '<tr><td>' + row.join('</td><td>') + '</td></tr>';
+      });
+      
+      html += '</table></body></html>';
+      
+      downloadFile(html, filename, 'application/vnd.ms-excel');
+    }
+
+    // Função auxiliar para copiar resumo para área de transferência
+    function copySummaryToClipboard(data, type) {
+      if (Object.keys(data).length === 0) {
+        alert('Não há dados para copiar.');
+        return;
+      }
+      
+      let text = `${type}\tQUANTIDADE\n`;
+      
+      Object.entries(data).forEach(([item, quantidade]) => {
+        text += `${item}\t${quantidade}\n`;
+      });
+      
+      // Adiciona total se for o resumo de produtos
+      if (type === 'PRODUTO') {
+        text += `TOTAL\t${totalItens}\n`;
+      }
+      
+      navigator.clipboard.writeText(text).then(function() {
+        alert(`Resumo de ${type.toLowerCase()} copiado para a área de transferência no formato para Notion!`);
+      }, function() {
+        alert('Erro ao copiar para a área de transferência. Por favor, tente novamente.');
+      });
+    }
+
+    // Função auxiliar para download de arquivo
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     }
   </script>
 </body>
