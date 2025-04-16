@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Processador de CSV</title>
+  <!-- Biblioteca PapaParse para ler CSV -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h2 {
+      margin-top: 30px;
+    }
+    table {
+      border-collapse: collapse;
+      margin-top: 10px;
+      width: 80%;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f4f4f4;
+    }
+    .container {
+      margin-bottom: 30px;
+    }
+    button {
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Leitor e Processador de CSV</h1>
+  <div class="container">
+    <input type="file" id="csvFile" accept=".csv">
+    <br>
+    <!-- Botões para exportar Planilha 1 -->
+    <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+    <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+    <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+  </div>
+
+  <h2>Tabela Processada</h2>
+  <table id="resultTable">
+    <thead>
+      <tr>
+        <th>Coluna 1</th>
+        <th>Coluna 2</th>
+        <th>Coluna 3</th>
+        <th>Coluna 4</th>
+        <th>Coluna 5</th>
+        <th>Coluna 9</th>
+        <th>Novo Código</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="container">
+    <!-- Botões para exportar Tabela Resumo -->
+    <button onclick="exportCSVSummary()">Exportar CSV (Resumo)</button>
+    <button onclick="exportXLSSummary()">Exportar XLS (Resumo)</button>
+    <button onclick="copySummaryTable()">Copiar Resumo (para Notion)</button>
+  </div>
+
+  <h2>Resumo de Códigos</h2>
+  <table id="summaryTable">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Quantidade</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    let processedData = []; // Dados da Planilha 1
+    const summaryCounts = {}; // Contagem dos códigos
+    let totalItens = 0;     // Soma dos valores da 8ª coluna (índice 7 do CSV)
+
+    // Função para determinar o novo código com base na coluna 4
+    function getCodigo(texto) {
+      const str = texto.toLowerCase();
+      if (str.includes("fixo")) {
+        return "Fixo";
+      } else if (str.includes("porta de correr") && str.includes("persiana")) {
+        return "PCR Integrada";
+      } else if (str.includes("janela de correr") && str.includes("persiana")) {
+        return "JCR Integrada";
+      } else if (str.includes("porta de correr")) {
+        return "PCR";
+      } else if (str.includes("janela de correr")) {
+        return "JCR";
+      } else if (str.includes("persiana")) {
+        return "Integrada";
+      } else if (str.includes("acm")) {
+        return "ACM";
+      } else if (str.includes("maxim-ar") || str.includes("maxim") || str.includes("max")) {
+        return "Maxim-ar";
+      } else if (str.includes("porta de giro")) {
+        return "PGR";
+      } else if (str.includes("pivotante")) {
+        return "Pivotante";
+      } else if (str.includes("brise")) {
+        return "Brise";
+      } else if (str.includes("ripado")) {
+        return "Ripado";
+      }
+      return "";
+    }
+
+    // Ao selecionar o arquivo CSV
+    document.getElementById('csvFile').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      Papa.parse(file, {
+        complete: function(results) {
+          processedData = [];
+          // Reinicia contagens
+          for (let key in summaryCounts) {
+            delete summaryCounts[key];
+          }
+          totalItens = 0;
+          const rows = results.data;
+          // Processar cada linha (pula linhas com poucos dados)
+          rows.forEach(row => {
+            if (!row || row.length < 9) return;
+            // Mantém as colunas: 1,2,3,4,5,9 (índices: 0,1,2,3,4,8)
+            const selected = [row[0], row[1], row[2], row[3], row[4], row[8]];
+            const codigo = getCodigo(row[3] || "");
+            const newRow = selected.concat(codigo);
+            processedData.push(newRow);
+            // Atualiza contagem do código
+            if (codigo) {
+              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
+            }
+            // Soma a quantidade total usando a 8ª coluna (índice 7)
+            let quantidade = Number(row[7].replace(",","."));
+            if (!isNaN(quantidade)) {
+              totalItens += quantidade;
+            }
+          });
+          renderResultTable();
+          renderSummaryTable();
+        },
+        error: function(err) {
+          alert("Erro ao ler o CSV: " + err.message);
+        }
+      });
+    });
+
+    // Renderiza a tabela processada (Planilha 1)
+    function renderResultTable() {
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+      processedData.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(col => {
+          const td = document.createElement("td");
+          td.textContent = col;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Renderiza a tabela resumo (Planilha 2)
+    function renderSummaryTable() {
+      const tbody = document.querySelector("#summaryTable tbody");
+      tbody.innerHTML = "";
+      // Para cada código, cria uma linha
+      Object.keys(summaryCounts).sort().forEach(key => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${key}</td><td>${summaryCounts[key]}</td>`;
+        tbody.appendChild(tr);
+      });
+      // Linha para total de itens
+      const trTotal = document.createElement("tr");
+      trTotal.innerHTML = `<td><strong>Total de Itens</strong></td><td><strong>${totalItens}</strong></td>`;
+      tbody.appendChild(trTotal);
+    }
+
+    // Função que converte uma tabela (ID informado) em texto tab-delimitado para cópia
+    function copyTableText(tableId) {
+      const table = document.getElementById(tableId);
+      let text = "";
+      for (let row of table.rows) {
+        let rowText = [];
+        for (let cell of row.cells) {
+          rowText.push(cell.innerText);
+        }
+        text += rowText.join("\t") + "\n";
+      }
+      return text;
+    }
+
+    // Copia a Planilha 1 para o clipboard
+    function copyProcessedTable() {
+      const text = copyTableText("resultTable");
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Planilha 1 copiada para a área de transferência!");
+      });
+    }
+
+    // Copia a Planilha 2 (Resumo) para o clipboard
+    function copySummaryTable() {
+      const text = copyTableText("summaryTable");
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Resumo copiado para a área de transferência!");
+      });
+    }
+
+    // Exporta a Planilha 1 para CSV
+    function exportCSV() {
+      const header = ["Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5", "Coluna 9", "Novo Código"];
+      let csvContent = header.join(",") + "\n";
+      processedData.forEach(row => {
+        const line = row.map(item => `"${item}"`).join(",");
+        csvContent += line + "\n";
+      });
+      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dados_processados.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Exporta a Planilha 1 para XLS (HTML formatado com charset utf-8)
+    function exportXLS() {
+      let tableHTML = `
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Coluna 1</th>
+              <th>Coluna 2</th>
+              <th>Coluna 3</th>
+              <th>Coluna 4</th>
+              <th>Coluna 5</th>
+              <th>Coluna 9</th>
+              <th>Novo Código</th>
+            </tr>
+          </thead>
+          <tbody>`;
+      processedData.forEach(row => {
+        tableHTML += "<tr>";
+        row.forEach(item => {
+          tableHTML += "<td>" + item + "</td>";
+        });
+        tableHTML += "</tr>";
+      });
+      tableHTML += `</tbody></table>`;
+      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "dados_processados.xls";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Exporta a Tabela Resumo para CSV
+    function exportCSVSummary() {
+      const header = ["Código", "Quantidade"];
+      let csvContent = header.join(",") + "\n";
+      // Para cada linha do resumo
+      const rows = document.querySelectorAll("#summaryTable tbody tr");
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td");
+        let arr = [];
+        cols.forEach(td => arr.push(`"${td.innerText}"`));
+        csvContent += arr.join(",") + "\n";
+      });
+      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resumo_dados.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // Exporta a Tabela Resumo para XLS (HTML formatado com charset utf-8)
+    function exportXLSSummary() {
+      let tableHTML = `
+        <table border="1">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody>`;
+      const rows = document.querySelectorAll("#summaryTable tbody tr");
+      rows.forEach(row => {
+        tableHTML += "<tr>";
+        const cells = row.querySelectorAll("td");
+        cells.forEach(cell => {
+          tableHTML += "<td>" + cell.innerText + "</td>";
+        });
+        tableHTML += "</tr>";
+      });
+      tableHTML += `</tbody></table>`;
+      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "resumo_dados.xls";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  </script>
+</body>
+</html>
