@@ -41,7 +41,7 @@
       align-items: center;
       margin-bottom: 20px;
       padding: 10px;
-      border-bottom: 2px solid #e74c3c; 
+      border-bottom: 2px solid #e74c3c;
     }
     .header-content {
       display: flex;
@@ -57,7 +57,7 @@
     .logo {
       height: 50px;
     }
-    /* Barra superior: tudo em uma linha */
+    /* Barra superior */
     .top-bar {
       max-width: 1200px;
       background: #fff;
@@ -71,14 +71,11 @@
       justify-content: space-between;
       gap: 10px;
     }
-    .file-group, 
-    .btn-group, 
-    .update-group {
+    .file-group, .btn-group, .update-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    /* Seletor de arquivo */
     .file-group input[type="file"] {
       min-width: 200px;
       padding: 8px 12px;
@@ -109,7 +106,6 @@
     .file-group input[type="file"]:focus {
       outline: none;
     }
-    /* Botões */
     button {
       background: #2c2c2c;
       color: #fff;
@@ -122,7 +118,6 @@
     button:hover {
       background: #1a1a1a;
     }
-    /* Container da Tabela */
     .container {
       max-width: 1200px;
       background: #fff;
@@ -131,7 +126,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    /* Tabela */
     table {
       width: 100%;
       border-collapse: separate;
@@ -151,7 +145,6 @@
     th {
       background: #f0f0f0;
     }
-    /* Resumos */
     .resumos-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -304,14 +297,16 @@
   </div>
 
   <script>
-    // Array com os dados principais
+    // Array com os dados processados (cada linha é um array)
     let processedData = [];
-    // Contagens para as tabelas de resumo
-    const summaryCounts = {};   // getCodigo()
-    const summaryCounts2 = {};  // getCodigo2()
+    // Variável global para guardar o último valor de cor atualizado
+    let lastUpdatedColor = null;
+    // Contagens para os resumos
+    const summaryCounts = {};   // Para PRODUTO (utilizando getCodigo)
+    const summaryCounts2 = {};  // Para CATEGORIA (utilizando getCodigo2)
     let totalItens = 0;         // Soma dos valores da 8ª coluna do CSV
 
-    // Função para determinar o PRODUTO (DESCRIÇÃO – COLUNA 4)
+    // Função para determinar o PRODUTO (baseada na DESCRIÇÃO – COLUNA 4)
     function getCodigo(texto) {
       const str = texto.toLowerCase();
       if (str.includes("fixo")) {
@@ -344,7 +339,7 @@
       return "";
     }
 
-    // Função para determinar a CATEGORIA (ITENS – COLUNA 3)
+    // Função para determinar a CATEGORIA (baseada nos ITENS – COLUNA 3)
     function getCodigo2(texto) {
       const str = texto.toLowerCase();
       if (str.includes("gol")) {
@@ -365,36 +360,35 @@
       if (!file) return;
       Papa.parse(file, {
         complete: function(results) {
-          // Limpa arrays e contadores
           processedData = [];
+          // Zera as contagens
           for (let key in summaryCounts) { delete summaryCounts[key]; }
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
           
           const rows = results.data;
           rows.forEach(row => {
-            if (!row || row.length < 9) return;  // ignora linhas com dados insuficientes
-            // Seleciona colunas: 2,3,4,5,9 -> índices (1,2,3,4,8)
+            if (!row || row.length < 9) return;  // Ignora linhas com dados insuficientes
+            // Seleciona as colunas desejadas: 2,3,4,5,9 (índices: 1,2,3,4,8)
             const selected = [row[1], row[2], row[3], row[4], row[8]];
             // Gera PRODUTO e CATEGORIA
             const codigo = getCodigo(row[3] || "");
             const codigo2 = getCodigo2(row[2] || "");
             const newRow = selected.concat(codigo, codigo2);
             processedData.push(newRow);
-
-            // Incrementa contadores
+  
+            // Incrementa as contagens
             if (codigo) {
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-
-            // Soma quantidade (coluna 8 do CSV, índice 7)
+  
+            // Soma a quantidade (coluna 8 do CSV, índice 7)
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
             }
           });
-
           renderResultTable();
           renderSummaryTable();
           renderSummaryTable2();
@@ -404,8 +398,8 @@
         }
       });
     });
-
-    // Renderiza a Tabela Principal (processedData)
+  
+    // Renderiza a Tabela Processada
     function renderResultTable() {
       const tbody = document.querySelector("#resultTable tbody");
       tbody.innerHTML = "";
@@ -419,8 +413,8 @@
         tbody.appendChild(tr);
       });
     }
-
-    // Renderiza Resumo de PRODUTO
+  
+    // Renderiza o Resumo para PRODUTO
     function renderSummaryTable() {
       const tbody = document.querySelector("#summaryTable tbody");
       tbody.innerHTML = "";
@@ -429,13 +423,12 @@
         tr.innerHTML = `<td>${key}</td><td>${summaryCounts[key]}</td>`;
         tbody.appendChild(tr);
       });
-      // totalItens
       const trTotal = document.createElement("tr");
       trTotal.innerHTML = `<td><strong>Total de Itens</strong></td><td><strong>${totalItens}</strong></td>`;
       tbody.appendChild(trTotal);
     }
-
-    // Renderiza Resumo de CATEGORIA
+  
+    // Renderiza o Resumo para CATEGORIA
     function renderSummaryTable2() {
       const tbody = document.querySelector("#summaryTable2 tbody");
       tbody.innerHTML = "";
@@ -445,12 +438,12 @@
         tbody.appendChild(tr);
       });
     }
-
-    // Copiar Tabela (sem cabeçalho) - Planilha 1
+  
+    // Função para copiar o conteúdo da tabela sem o cabeçalho (para Notion)
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
-      // Copia apenas as linhas a partir do índice 1 (pulando cabeçalho)
+      // Copia a partir da linha 1 (pulando cabeçalho)
       for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
         for (let cell of table.rows[i].cells) {
@@ -460,7 +453,7 @@
       }
       return text;
     }
-
+  
     function copyProcessedTable() {
       const text = copyTableText("resultTable");
       navigator.clipboard.writeText(text).then(() => {
@@ -479,8 +472,8 @@
         alert("Resumo 2 copiado para a área de transferência!");
       });
     }
-
-    // Exportar Tabelas – CSV / XLS
+  
+    // Exporta o CSV da Tabela Processada
     function exportCSV() {
       const header = ["TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"];
       let csvContent = header.join(",") + "\n";
@@ -497,6 +490,8 @@
       a.click();
       document.body.removeChild(a);
     }
+  
+    // Exporta para XLS da Tabela Processada
     function exportXLS() {
       let tableHTML = `
         <table border="1">
@@ -529,6 +524,8 @@
       a.click();
       document.body.removeChild(a);
     }
+  
+    // Exporta Resumo 1 em CSV
     function exportCSVSummary() {
       const header = ["PRODUTO", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
@@ -548,6 +545,8 @@
       a.click();
       document.body.removeChild(a);
     }
+  
+    // Exporta Resumo 1 em XLS
     function exportXLSSummary() {
       let tableHTML = `
         <table border="1">
@@ -577,6 +576,8 @@
       a.click();
       document.body.removeChild(a);
     }
+  
+    // Exporta Resumo 2 em CSV
     function exportCSVSummary2() {
       const header = ["CATEGORIA", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
@@ -596,6 +597,8 @@
       a.click();
       document.body.removeChild(a);
     }
+  
+    // Exporta Resumo 2 em XLS
     function exportXLSSummary2() {
       let tableHTML = `
         <table border="1">
@@ -625,8 +628,10 @@
       a.click();
       document.body.removeChild(a);
     }
-
-    // Atualiza a coluna COR (index 4) SOMENTE para as linhas cujo texto atual contenha "CEY" ou "ROB" (case-insensitive).
+  
+    // Função updateCol9 atualizada:
+    // Na primeira vez, atualiza linhas cuja coluna COR contenha "cey" ou "rob".
+    // Em atualizações subsequentes, atualiza somente as linhas cuja COR for igual (case-insensitive) ao último valor atualizado.
     function updateCol9() {
       const newCor = document.getElementById("col9Color").value.trim();
       if (!newCor) {
@@ -635,14 +640,23 @@
       }
       const tbody = document.querySelector("#resultTable tbody");
       for (let i = 0; i < processedData.length; i++) {
-        // Pega o valor ATUAL da coluna COR (index 4)
-        let corAtual = processedData[i][4] ? processedData[i][4].toLowerCase() : "";
-        // Se contiver "cey" ou "rob", substitui
-        if (corAtual.includes("cey") || corAtual.includes("rob")) {
-          tbody.rows[i].cells[4].textContent = newCor;
-          processedData[i][4] = newCor;
+        let currentCor = processedData[i][4] ? processedData[i][4].toLowerCase() : "";
+        if (lastUpdatedColor === null) {
+          // Primeira atualização: verifica se contém "cey" ou "rob"
+          if (currentCor.includes("cey") || currentCor.includes("rob")) {
+            tbody.rows[i].cells[4].textContent = newCor;
+            processedData[i][4] = newCor;
+          }
+        } else {
+          // Atualizações subsequentes: atualiza se a célula for igual ao último valor atualizado (ignorando case)
+          if (currentCor === lastUpdatedColor.toLowerCase()) {
+            tbody.rows[i].cells[4].textContent = newCor;
+            processedData[i][4] = newCor;
+          }
         }
       }
+      // Define o novo valor como o último valor atualizado para futuras atualizações
+      lastUpdatedColor = newCor;
       alert("Atualização da Coluna COR concluída!");
     }
   </script>
