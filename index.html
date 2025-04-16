@@ -1,661 +1,664 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<link rel="icon" type="image/png" href="LOGO.png">
-<head>
-  <meta charset="UTF-8">
-  <title>TRATAMENTO PLANILHA ITENS</title>
-  <!-- Biblioteca PapaParse para ler CSV -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <!-- Fonte Roboto -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
-  <style>
-    .resumo-container {
-      display: flex;
-      justify-content: center;
-      padding: 40px 20px;
-    }
-    #resultTable {
-      margin: 0 auto;
-      display: table;
-    }
-    /* Reset Básico */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: #f5f7fa;
-      color: #333;
-      line-height: 1.6;
-      padding: 20px;
-    }
-    h1, h2, h3 {
-      text-transform: uppercase;
-      text-align: center;
-    }
-    /* Cabeçalho Minimalista */
-    .main-header {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-      padding: 10px;
-      border-bottom: 2px solid #e74c3c; /* detalhe em vermelho */
-    }
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .main-header h1 {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #333;
-      margin: 0;
-    }
-    .logo {
-      height: 50px; /* ajuste conforme necessário */
-    }
-    /* Barra superior: tudo em uma linha */
-    .top-bar {
-      max-width: 1200px;
-      background: #fff;
-      margin: 0 auto 20px auto;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .file-group, 
-    .btn-group, 
-    .update-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    /* Estilização customizada para o seletor de arquivo */
-    .file-group input[type="file"] {
-      min-width: 200px;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      background-color: #fff;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .file-group input[type="file"]::-webkit-file-upload-button {
-      visibility: hidden;
-    }
-    .file-group input[type="file"]::before {
-      content: 'Escolher arquivo';
-      display: inline-block;
-      background: #007BFF;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-right: 10px;
-    }
-    .file-group input[type="file"]:hover::before {
-      background: #0056b3;
-    }
-    .file-group input[type="file"]:focus {
-      outline: none;
-    }
-    /* Botões - Tom preto com hover levemente mais escuro */
-    button {
-      background: #2c2c2c;
-      color: #fff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #1a1a1a;
-    }
-    /* Container geral para tabela principal */
-    .container {
-      max-width: 1200px;
-      background: #fff;
-      padding: 20px;
-      margin: 0 auto 20px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    /* Tabela principal minimalista */
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      margin-top: 10px;
-      overflow-x: auto;
-      display: block;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px 8px;
-      text-align: center;
-      word-break: break-word;
-    }
-    th {
-      background: #f0f0f0;
-    }
-    /* Área dos resumos */
-    .resumos-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .resumo-box {
-      flex: 1 1 400px;
-      max-width: 600px;
-      background: #fff;
-      padding: 20px; /* Mantém apenas esse padding */
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-    }
-    .btn-container {
-      margin-top: auto;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      padding-top: 20px;
-    }
-    .resumo-table-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    .resumo-table-container table {
-      margin: 0 auto;
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      width: auto;
-      display: inline-block;
-    }
-    .btn-container {
-      width: 100%;
-      margin-top: 15px;
-      text-align: center;
-    }
-    .btn-container .btn-group {
-      display: inline-flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    @media (max-width: 600px) {
-      th, td {
-        padding: 8px 4px;
+  <head>
+    <meta charset="UTF-8">
+    <title>TRATAMENTO PLANILHA ITENS</title>
+    <!-- Biblioteca PapaParse para ler CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- Fonte Roboto -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
+    <style>
+      .resumo-container {
+        display: flex;
+        justify-content: center;
+        padding: 40px 20px;
       }
-      button {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
-      .resumo-table-container {
-        overflow-x: auto;
-      }
-      .resumo-table-container table {
-        width: 100%;
-        margin: 10px 0;
+      #resultTable {
+        margin: 0 auto;
         display: table;
       }
-    }
-  </style>
-</head>
-<body>
-  <!-- Cabeçalho Minimalista -->
-  <header class="main-header">
-    <div class="header-content">
-      <h1>TRATAMENTO PLANILHA DE ITENS | PERFECTA</h1>
-      <img src="LOGO.png" alt="Logo Perfecta" class="logo">
-    </div>
-  </header>
-
-  <!-- Barra superior -->
-  <div class="top-bar">
-    <div class="file-group">
-      <input type="file" id="csvFile" accept=".csv,.txt">
-    </div>
-    <div class="btn-group">
-      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
-      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
-      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
-    </div>
-    <div class="update-group">
-      <label for="col9Color" style="white-space:nowrap;">COR:</label>
-      <input type="text" id="col9Color" placeholder="Ex.: peltre">
-      <button onclick="updateCol9()">Confirmar</button>
-    </div>
-  </div>
-
-  <div class="container">
-    <h2>TABELA PROCESSADA</h2>
-    <table id="resultTable">
-      <thead>
-        <tr>
-          <th>TIPO</th>
-          <th>ITENS</th>
-          <th>DESCRIÇÃO</th>
-          <th>AMBIENTE</th>
-          <th>COR</th>
-          <th>PRODUTO</th>
-          <th>CATEGORIA</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Dados serão preenchidos dinamicamente -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Resumos Lado a Lado -->
-  <div class="resumos-container">
-    <div class="resumo-box">
-      <h2>TOTAL PRODUTO</h2>
-      <div class="resumo-table-container">
-        <table id="summaryTable">
-          <thead>
-            <tr>
-              <th>PRODUTO</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      /* Reset Básico */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: 'Roboto', sans-serif;
+        background: #f5f7fa;
+        color: #333;
+        line-height: 1.6;
+        padding: 20px;
+      }
+      h1, h2, h3 {
+        text-transform: uppercase;
+        text-align: center;
+      }
+      /* Cabeçalho Minimalista */
+      .main-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 10px;
+        border-bottom: 2px solid #e74c3c;
+      }
+      .header-content {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .main-header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+      }
+      .logo {
+        height: 50px;
+      }
+      /* Barra superior: tudo em uma linha */
+      .top-bar {
+        max-width: 1200px;
+        background: #fff;
+        margin: 0 auto 20px auto;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+      .file-group, 
+      .btn-group, 
+      .update-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      /* Estilização customizada para o seletor de arquivo */
+      .file-group input[type="file"] {
+        min-width: 200px;
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #fff;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      .file-group input[type="file"]::-webkit-file-upload-button {
+        visibility: hidden;
+      }
+      .file-group input[type="file"]::before {
+        content: 'Escolher arquivo';
+        display: inline-block;
+        background: #007BFF;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+      }
+      .file-group input[type="file"]:hover::before {
+        background: #0056b3;
+      }
+      .file-group input[type="file"]:focus {
+        outline: none;
+      }
+      /* Botões */
+      button {
+        background: #2c2c2c;
+        color: #fff;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: #1a1a1a;
+      }
+      /* Container da Tabela */
+      .container {
+        max-width: 1200px;
+        background: #fff;
+        padding: 20px;
+        margin: 0 auto 20px auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      /* Tabela */
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-top: 10px;
+        overflow-x: auto;
+        display: block;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      th, td {
+        border: 1px solid #ddd;
+        padding: 12px 8px;
+        text-align: center;
+        word-break: break-word;
+      }
+      th {
+        background: #f0f0f0;
+      }
+      /* Resumos */
+      .resumos-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .resumo-box {
+        flex: 1 1 400px;
+        max-width: 600px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+      }
+      .btn-container {
+        margin-top: auto;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        padding-top: 20px;
+      }
+      .resumo-table-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .resumo-table-container table {
+        margin: 0 auto;
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: auto;
+        display: inline-block;
+      }
+      @media (max-width: 600px) {
+        th, td {
+          padding: 8px 4px;
+        }
+        button {
+          padding: 8px 12px;
+          font-size: 14px;
+        }
+        .resumo-table-container {
+          overflow-x: auto;
+        }
+        .resumo-table-container table {
+          width: 100%;
+          margin: 10px 0;
+          display: table;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Cabeçalho -->
+    <header class="main-header">
+      <div class="header-content">
+        <h1>TRATAMENTO PLANILHA DE ITENS | PERFECTA</h1>
+        <img src="LOGO.png" alt="Logo Perfecta" class="logo">
       </div>
-      <div class="btn-container">
-        <div class="btn-group">
-          <button onclick="exportCSVSummary()">Exportar CSV</button>
-          <button onclick="exportXLSSummary()">Exportar XLS</button>
-          <button onclick="copySummaryTable()">Copiar (para Notion)</button>
+    </header>
+  
+    <!-- Barra superior -->
+    <div class="top-bar">
+      <div class="file-group">
+        <input type="file" id="csvFile" accept=".csv,.txt">
+      </div>
+      <div class="btn-group">
+        <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+        <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+        <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+      </div>
+      <div class="update-group">
+        <label for="col9Color" style="white-space:nowrap;">COR:</label>
+        <input type="text" id="col9Color" placeholder="Ex.: peltre">
+        <button onclick="updateCol9()">Confirmar</button>
+      </div>
+    </div>
+  
+    <div class="container">
+      <h2>TABELA PROCESSADA</h2>
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th>TIPO</th>
+            <th>ITENS</th>
+            <th>DESCRIÇÃO</th>
+            <th>AMBIENTE</th>
+            <th>COR</th>
+            <th>PRODUTO</th>
+            <th>CATEGORIA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dados serão preenchidos dinamicamente -->
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Resumos Lado a Lado -->
+    <div class="resumos-container">
+      <div class="resumo-box">
+        <h2>TOTAL PRODUTO</h2>
+        <div class="resumo-table-container">
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>PRODUTO</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="btn-container">
+          <div class="btn-group">
+            <button onclick="exportCSVSummary()">Exportar CSV</button>
+            <button onclick="exportXLSSummary()">Exportar XLS</button>
+            <button onclick="copySummaryTable()">Copiar (para Notion)</button>
+          </div>
+        </div>
+      </div>
+  
+      <div class="resumo-box">
+        <h2>TOTAL CATEGORIA</h2>
+        <div class="resumo-table-container">
+          <table id="summaryTable2">
+            <thead>
+              <tr>
+                <th>CATEGORIA</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="btn-container">
+          <div class="btn-group">
+            <button onclick="exportCSVSummary2()">Exportar CSV</button>
+            <button onclick="exportXLSSummary2()">Exportar XLS</button>
+            <button onclick="copySummaryTable2()">Copiar (para Notion)</button>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="resumo-box">
-      <h2>TOTAL CATEGORIA</h2>
-      <div class="resumo-table-container">
-        <table id="summaryTable2">
-          <thead>
-            <tr>
-              <th>CATEGORIA</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-      <div class="btn-container">
-        <div class="btn-group">
-          <button onclick="exportCSVSummary2()">Exportar CSV</button>
-          <button onclick="exportXLSSummary2()">Exportar XLS</button>
-          <button onclick="copySummaryTable2()">Copiar (para Notion)</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let processedData = []; // Dados da Planilha 1
-    const summaryCounts = {}; // Contagem para PRODUTO (função getCodigo)
-    const summaryCounts2 = {}; // Contagem para CATEGORIA (função getCodigo2)
-    let totalItens = 0;     // Soma dos valores da 8ª coluna do CSV
-
-    // Função para determinar o PRODUTO (a partir da DESCRIÇÃO – COLUNA 4)
-    function getCodigo(texto) {
-      const str = texto.toLowerCase();
-      if (str.includes("fixo")) {
-        return "Fixo";
-      } else if (str.includes("porta de correr") && str.includes("persiana")) {
-        return "PCR Integrada";
-      } else if (str.includes("janela de correr") && str.includes("persiana")) {
-        return "JCR Integrada";
-      } else if (str.includes("porta de correr")) {
-        return "PCR";
-      } else if (str.includes("janela de correr")) {
-        return "JCR";
-      } else if (str.includes("persiana")) {
-        return "Integrada";
-      } else if (str.includes("acm")) {
-        return "ACM";
-      } else if (str.includes("maxim-ar") || str.includes("maxim") || str.includes("max")) {
-        return "Maxim-ar";
-      } else if (str.includes("porta de giro")) {
-        return "PGR";
-      } else if (str.includes("oscilo") || str.includes("osc") || str.includes("abt")) {
-        return "Oscilo";
-      } else if (str.includes("pivotante")) {
-        return "Pivotante";
-      } else if (str.includes("brise")) {
-        return "Brise";
-      } else if (str.includes("ripado")) {
-        return "Ripado";
+  
+    <script>
+      // Array com os dados processados (cada linha é um array)
+      let processedData = [];
+      // Array que indica, para cada linha, se ela deverá ser atualizada (baseado na cor original)
+      let qualifyForUpdate = [];
+      // Contagens para os resumos
+      const summaryCounts = {};   // Para PRODUTO (obtido via getCodigo)
+      const summaryCounts2 = {};  // Para CATEGORIA (obtido via getCodigo2)
+      let totalItens = 0;         // Soma dos valores da 8ª coluna do CSV
+  
+      // Função para determinar o PRODUTO (a partir da DESCRIÇÃO – COLUNA 4)
+      function getCodigo(texto) {
+        const str = texto.toLowerCase();
+        if (str.includes("fixo")) {
+          return "Fixo";
+        } else if (str.includes("porta de correr") && str.includes("persiana")) {
+          return "PCR Integrada";
+        } else if (str.includes("janela de correr") && str.includes("persiana")) {
+          return "JCR Integrada";
+        } else if (str.includes("porta de correr")) {
+          return "PCR";
+        } else if (str.includes("janela de correr")) {
+          return "JCR";
+        } else if (str.includes("persiana")) {
+          return "Integrada";
+        } else if (str.includes("acm")) {
+          return "ACM";
+        } else if (str.includes("maxim-ar") || str.includes("maxim") || str.includes("max")) {
+          return "Maxim-ar";
+        } else if (str.includes("porta de giro")) {
+          return "PGR";
+        } else if (str.includes("oscilo") || str.includes("osc") || str.includes("abt")) {
+          return "Oscilo";
+        } else if (str.includes("pivotante")) {
+          return "Pivotante";
+        } else if (str.includes("brise")) {
+          return "Brise";
+        } else if (str.includes("ripado")) {
+          return "Ripado";
+        }
+        return "";
       }
-      return "";
-    }
-
-    // Função para determinar a CATEGORIA (a partir dos ITENS – COLUNA 3)
-    function getCodigo2(texto) {
-      const str = texto.toLowerCase();
-      if (str.includes("gol")) {
-        return "Aluminio";
-      } else if (str.includes("rip")) {
-        return "Ripado";
-      } else if (str.includes("brise")) {
-        return "Brise";
-      } else if (str.includes("acm") || str.includes("layer")) {
-        return "Layer";
+  
+      // Função para determinar a CATEGORIA (a partir dos ITENS – COLUNA 3)
+      function getCodigo2(texto) {
+        const str = texto.toLowerCase();
+        if (str.includes("gol")) {
+          return "Aluminio";
+        } else if (str.includes("rip")) {
+          return "Ripado";
+        } else if (str.includes("brise")) {
+          return "Brise";
+        } else if (str.includes("acm") || str.includes("layer")) {
+          return "Layer";
+        }
+        return "PVC";
       }
-      return "PVC";
-    }
-
-    // Leitura do arquivo CSV/TXT
-    document.getElementById('csvFile').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      Papa.parse(file, {
-        complete: function(results) {
-          processedData = [];
-          // Zera as contagens anteriores
-          for (let key in summaryCounts) { delete summaryCounts[key]; }
-          for (let key in summaryCounts2) { delete summaryCounts2[key]; }
-          totalItens = 0;
-          const rows = results.data;
-          // Processa cada linha (ignora linhas com dados insuficientes)
-          rows.forEach(row => {
-            if (!row || row.length < 9) return;
-            // Seleciona as colunas: 2,3,4,5,9 (índices: 1,2,3,4,8)
-            const selected = [row[1], row[2], row[3], row[4], row[8]];
-            const codigo = getCodigo(row[3] || "");
-            const codigo2 = getCodigo2(row[2] || "");
-            // Acrescenta os valores derivados como PRODUTO e CATEGORIA
-            const newRow = selected.concat(codigo, codigo2);
-            processedData.push(newRow);
-            if (codigo) {
-              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
-            }
-            summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-            let quantidade = Number(row[7].replace(",", "."));
-            if (!isNaN(quantidade)) {
-              totalItens += quantidade;
-            }
+  
+      // Leitura do arquivo CSV/TXT
+      document.getElementById('csvFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        Papa.parse(file, {
+          complete: function(results) {
+            processedData = [];
+            qualifyForUpdate = []; // Zera as flags também
+            // Zera as contagens
+            for (let key in summaryCounts) { delete summaryCounts[key]; }
+            for (let key in summaryCounts2) { delete summaryCounts2[key]; }
+            totalItens = 0;
+            const rows = results.data;
+            // Processa cada linha (ignora linhas com dados insuficientes)
+            rows.forEach(row => {
+              if (!row || row.length < 9) return;
+              // Seleciona as colunas desejadas: 2,3,4,5 e 9 (índices: 1,2,3,4,8)
+              const selected = [row[1], row[2], row[3], row[4], row[8]];
+              const codigo = getCodigo(row[3] || "");
+              const codigo2 = getCodigo2(row[2] || "");
+              // Cria a nova linha, acrescentando PRODUTO e CATEGORIA
+              const newRow = selected.concat(codigo, codigo2);
+              processedData.push(newRow);
+              // Define a flag se a cor (origem: selected[4]) contiver "cey" ou "rob" (case-insensitive)
+              let corOriginal = selected[4] ? selected[4].toLowerCase() : "";
+              qualifyForUpdate.push( corOriginal.includes("cey") || corOriginal.includes("rob") );
+  
+              // Incrementa as contagens
+              if (codigo) {
+                summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
+              }
+              summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
+  
+              // Soma a quantidade (coluna 8 no CSV, índice 7)
+              let quantidade = Number(row[7].replace(",", "."));
+              if (!isNaN(quantidade)) {
+                totalItens += quantidade;
+              }
+            });
+            renderResultTable();
+            renderSummaryTable();
+            renderSummaryTable2();
+          },
+          error: function(err) {
+            alert("Erro ao ler o CSV: " + err.message);
+          }
+        });
+      });
+  
+      // Renderiza a Tabela Processada
+      function renderResultTable() {
+        const tbody = document.querySelector("#resultTable tbody");
+        tbody.innerHTML = "";
+        processedData.forEach(row => {
+          const tr = document.createElement("tr");
+          row.forEach(col => {
+            const td = document.createElement("td");
+            td.textContent = col;
+            tr.appendChild(td);
           });
-          renderResultTable();
-          renderSummaryTable();
-          renderSummaryTable2();
-        },
-        error: function(err) {
-          alert("Erro ao ler o CSV: " + err.message);
-        }
-      });
-    });
-
-    // Renderiza a Tabela Processada
-    function renderResultTable() {
-      const tbody = document.querySelector("#resultTable tbody");
-      tbody.innerHTML = "";
-      processedData.forEach(row => {
-        const tr = document.createElement("tr");
-        row.forEach(col => {
-          const td = document.createElement("td");
-          td.textContent = col;
-          tr.appendChild(td);
+          tbody.appendChild(tr);
         });
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Renderiza o Resumo para PRODUTO (resultado da função getCodigo)
-    function renderSummaryTable() {
-      const tbody = document.querySelector("#summaryTable tbody");
-      tbody.innerHTML = "";
-      Object.keys(summaryCounts).sort().forEach(key => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${key}</td><td>${summaryCounts[key]}</td>`;
-        tbody.appendChild(tr);
-      });
-      const trTotal = document.createElement("tr");
-      trTotal.innerHTML = `<td><strong>Total de Itens</strong></td><td><strong>${totalItens}</strong></td>`;
-      tbody.appendChild(trTotal);
-    }
-
-    // Renderiza o Resumo para CATEGORIA (resultado da função getCodigo2)
-    function renderSummaryTable2() {
-      const tbody = document.querySelector("#summaryTable2 tbody");
-      tbody.innerHTML = "";
-      Object.keys(summaryCounts2).sort().forEach(key => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${key}</td><td>${summaryCounts2[key]}</td>`;
-        tbody.appendChild(tr);
-      });
-    }
-
-    // Função para copiar os dados das tabelas (SEM o cabeçalho)
-    function copyTableText(tableId) {
-      const table = document.getElementById(tableId);
-      let text = "";
-      // Copia apenas as linhas a partir do índice 1 (pulando o cabeçalho)
-      for (let i = 1; i < table.rows.length; i++) {
-        let rowText = [];
-        for (let cell of table.rows[i].cells) {
-          rowText.push(cell.innerText);
-        }
-        text += rowText.join("\t") + "\n";
       }
-      return text;
-    }
-
-    // Copia a Planilha 1 (resultTable)
-    function copyProcessedTable() {
-      const text = copyTableText("resultTable");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Planilha 1 copiada para a área de transferência!");
-      });
-    }
-    // Copia o Resumo 1 (summaryTable)
-    function copySummaryTable() {
-      const text = copyTableText("summaryTable");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Resumo 1 copiado para a área de transferência!");
-      });
-    }
-    // Copia o Resumo 2 (summaryTable2)
-    function copySummaryTable2() {
-      const text = copyTableText("summaryTable2");
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Resumo 2 copiado para a área de transferência!");
-      });
-    }
-
-    // Exportar Tabelas – CSV / XLS
-    function exportCSV() {
-      const header = ["TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"];
-      let csvContent = header.join(",") + "\n";
-      processedData.forEach(row => {
-        const line = row.map(item => `"${item}"`).join(",");
-        csvContent += line + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "dados_processados.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function exportXLS() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>TIPO</th>
-              <th>ITENS</th>
-              <th>DESCRIÇÃO</th>
-              <th>AMBIENTE</th>
-              <th>COR</th>
-              <th>PRODUTO</th>
-              <th>CATEGORIA</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      processedData.forEach(row => {
-        tableHTML += "<tr>";
-        row.forEach(item => {
-          tableHTML += "<td>" + item + "</td>";
+  
+      // Renderiza o Resumo para PRODUTO
+      function renderSummaryTable() {
+        const tbody = document.querySelector("#summaryTable tbody");
+        tbody.innerHTML = "";
+        Object.keys(summaryCounts).sort().forEach(key => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${key}</td><td>${summaryCounts[key]}</td>`;
+          tbody.appendChild(tr);
         });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "dados_processados.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function exportCSVSummary() {
-      const header = ["PRODUTO", "QUANTIDADE"];
-      let csvContent = header.join(",") + "\n";
-      const rows = document.querySelectorAll("#summaryTable tbody tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        let arr = [];
-        cols.forEach(td => arr.push(`"${td.innerText}"`));
-        csvContent += arr.join(",") + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function exportXLSSummary() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>PRODUTO</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      const rows = document.querySelectorAll("#summaryTable tbody tr");
-      rows.forEach(row => {
-        tableHTML += "<tr>";
-        const cells = row.querySelectorAll("td");
-        cells.forEach(cell => {
-          tableHTML += "<td>" + cell.innerText + "</td>";
-        });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function exportCSVSummary2() {
-      const header = ["CATEGORIA", "QUANTIDADE"];
-      let csvContent = header.join(",") + "\n";
-      const rows = document.querySelectorAll("#summaryTable2 tbody tr");
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td");
-        let arr = [];
-        cols.forEach(td => arr.push(`"${td.innerText}"`));
-        csvContent += arr.join(",") + "\n";
-      });
-      const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados2.csv";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    function exportXLSSummary2() {
-      let tableHTML = `
-        <table border="1">
-          <thead>
-            <tr>
-              <th>CATEGORIA</th>
-              <th>QUANTIDADE</th>
-            </tr>
-          </thead>
-          <tbody>`;
-      const rows = document.querySelectorAll("#summaryTable2 tbody tr");
-      rows.forEach(row => {
-        tableHTML += "<tr>";
-        const cells = row.querySelectorAll("td");
-        cells.forEach(cell => {
-          tableHTML += "<td>" + cell.innerText + "</td>";
-        });
-        tableHTML += "</tr>";
-      });
-      tableHTML += `</tbody></table>`;
-      const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "resumo_dados2.xls";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-
-    // Atualiza a coluna COR apenas para as linhas cujo valor da coluna ITENS contenha "cey" ou "rob"
-    function updateCol9() {
-      const newCor = document.getElementById("col9Color").value.trim();
-      if (!newCor) {
-        alert("Informe o texto (cor) para atualização.");
-        return;
+        const trTotal = document.createElement("tr");
+        trTotal.innerHTML = `<td><strong>Total de Itens</strong></td><td><strong>${totalItens}</strong></td>`;
+        tbody.appendChild(trTotal);
       }
-      const tbody = document.querySelector("#resultTable tbody");
-      // Percorre os registros; atualiza apenas se a coluna ITENS conter "cey" ou "rob"
-      for (let i = 0; i < processedData.length; i++) {
-        let itensValue = processedData[i][1] ? processedData[i][1].toLowerCase() : "";
-        if (itensValue.includes("cey") || itensValue.includes("rob")) {
-          tbody.rows[i].cells[4].textContent = newCor;
-          processedData[i][4] = newCor;
+  
+      // Renderiza o Resumo para CATEGORIA
+      function renderSummaryTable2() {
+        const tbody = document.querySelector("#summaryTable2 tbody");
+        tbody.innerHTML = "";
+        Object.keys(summaryCounts2).sort().forEach(key => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${key}</td><td>${summaryCounts2[key]}</td>`;
+          tbody.appendChild(tr);
+        });
+      }
+  
+      // Função para copiar os dados da tabela sem o cabeçalho (para Notion)
+      function copyTableText(tableId) {
+        const table = document.getElementById(tableId);
+        let text = "";
+        // Copia apenas as linhas a partir do índice 1 (pulando o cabeçalho)
+        for (let i = 1; i < table.rows.length; i++) {
+          let rowText = [];
+          for (let cell of table.rows[i].cells) {
+            rowText.push(cell.innerText);
+          }
+          text += rowText.join("\t") + "\n";
         }
+        return text;
       }
-      alert("Atualização da Coluna COR concluída!");
-    }
-  </script>
-</body>
+  
+      // Copia a Planilha 1 (resultTable) para a área de transferência (sem o cabeçalho)
+      function copyProcessedTable() {
+        const text = copyTableText("resultTable");
+        navigator.clipboard.writeText(text).then(() => {
+          alert("Planilha 1 copiada para a área de transferência!");
+        });
+      }
+      function copySummaryTable() {
+        const text = copyTableText("summaryTable");
+        navigator.clipboard.writeText(text).then(() => {
+          alert("Resumo 1 copiado para a área de transferência!");
+        });
+      }
+      function copySummaryTable2() {
+        const text = copyTableText("summaryTable2");
+        navigator.clipboard.writeText(text).then(() => {
+          alert("Resumo 2 copiado para a área de transferência!");
+        });
+      }
+  
+      // Exporta a tabela processada em CSV
+      function exportCSV() {
+        const header = ["TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"];
+        let csvContent = header.join(",") + "\n";
+        processedData.forEach(row => {
+          const line = row.map(item => `"${item}"`).join(",");
+          csvContent += line + "\n";
+        });
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "dados_processados.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Exporta a tabela processada em XLS
+      function exportXLS() {
+        let tableHTML = `
+          <table border="1">
+            <thead>
+              <tr>
+                <th>TIPO</th>
+                <th>ITENS</th>
+                <th>DESCRIÇÃO</th>
+                <th>AMBIENTE</th>
+                <th>COR</th>
+                <th>PRODUTO</th>
+                <th>CATEGORIA</th>
+              </tr>
+            </thead>
+            <tbody>`;
+        processedData.forEach(row => {
+          tableHTML += "<tr>";
+          row.forEach(item => {
+            tableHTML += "<td>" + item + "</td>";
+          });
+          tableHTML += "</tr>";
+        });
+        tableHTML += `</tbody></table>`;
+        const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "dados_processados.xls";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Exporta o resumo 1 em CSV
+      function exportCSVSummary() {
+        const header = ["PRODUTO", "QUANTIDADE"];
+        let csvContent = header.join(",") + "\n";
+        const rows = document.querySelectorAll("#summaryTable tbody tr");
+        rows.forEach(row => {
+          const cols = row.querySelectorAll("td");
+          let arr = [];
+          cols.forEach(td => arr.push(`"${td.innerText}"`));
+          csvContent += arr.join(",") + "\n";
+        });
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resumo_dados.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Exporta o resumo 1 em XLS
+      function exportXLSSummary() {
+        let tableHTML = `
+          <table border="1">
+            <thead>
+              <tr>
+                <th>PRODUTO</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody>`;
+        const rows = document.querySelectorAll("#summaryTable tbody tr");
+        rows.forEach(row => {
+          tableHTML += "<tr>";
+          const cells = row.querySelectorAll("td");
+          cells.forEach(cell => {
+            tableHTML += "<td>" + cell.innerText + "</td>";
+          });
+          tableHTML += "</tr>";
+        });
+        tableHTML += `</tbody></table>`;
+        const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resumo_dados.xls";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Exporta o resumo 2 em CSV
+      function exportCSVSummary2() {
+        const header = ["CATEGORIA", "QUANTIDADE"];
+        let csvContent = header.join(",") + "\n";
+        const rows = document.querySelectorAll("#summaryTable2 tbody tr");
+        rows.forEach(row => {
+          const cols = row.querySelectorAll("td");
+          let arr = [];
+          cols.forEach(td => arr.push(`"${td.innerText}"`));
+          csvContent += arr.join(",") + "\n";
+        });
+        const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resumo_dados2.csv";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Exporta o resumo 2 em XLS
+      function exportXLSSummary2() {
+        let tableHTML = `
+          <table border="1">
+            <thead>
+              <tr>
+                <th>CATEGORIA</th>
+                <th>QUANTIDADE</th>
+              </tr>
+            </thead>
+            <tbody>`;
+        const rows = document.querySelectorAll("#summaryTable2 tbody tr");
+        rows.forEach(row => {
+          tableHTML += "<tr>";
+          const cells = row.querySelectorAll("td");
+          cells.forEach(cell => {
+            tableHTML += "<td>" + cell.innerText + "</td>";
+          });
+          tableHTML += "</tr>";
+        });
+        tableHTML += `</tbody></table>`;
+        const blob = new Blob([tableHTML], { type: "application/vnd.ms-excel;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "resumo_dados2.xls";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+  
+      // Atualiza a coluna COR: para cada linha que, originalmente (via CSV), a cor continha "cey" ou "rob" (indicado em qualifyForUpdate),
+      // substitui o conteúdo da célula COR (índice 4) pelo novo valor informado.
+      function updateCol9() {
+        const newCor = document.getElementById("col9Color").value.trim();
+        if (!newCor) {
+          alert("Informe o texto (cor) para atualização.");
+          return;
+        }
+        const tbody = document.querySelector("#resultTable tbody");
+        for (let i = 0; i < processedData.length; i++) {
+          // Atualiza apenas as linhas que foram marcadas originalmente para atualização
+          if (qualifyForUpdate[i]) {
+            tbody.rows[i].cells[4].textContent = newCor;
+            processedData[i][4] = newCor;
+          }
+        }
+        alert("Atualização da Coluna COR concluída!");
+      }
+    </script>
+  </body>
 </html>
