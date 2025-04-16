@@ -414,12 +414,11 @@
     function updateCol9() {
       const selectedOption = document.getElementById("col9Option").value;
       const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
-      // Itera sobre as linhas da tabela processada
       const tbody = document.querySelector("#resultTable tbody");
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9 (índice 5)
-        if (cell.textContent.toUpperCase().includes(selectedOption.toUpperCase())) {
-          // Atualiza o conteúdo e cor de fundo
+        let cellText = cell.textContent.trim();
+        if (cellText.toUpperCase().includes(selectedOption.toUpperCase())) {
           cell.textContent = selectedOption;
           cell.style.backgroundColor = color;
         }
