@@ -7,7 +7,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <!-- Fonte Roboto -->
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
-
   <style>
     /* Reset Básico */
     * {
@@ -36,11 +35,10 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-
-      display: flex;               /* Organiza em linha */
-      flex-wrap: wrap;            /* Permite quebra em telas pequenas */
-      align-items: center;         /* Alinha verticalmente no centro */
-      justify-content: space-between; /* Separa os grupos com espaçamento */
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
       gap: 10px;
     }
 
@@ -85,7 +83,7 @@
       border-collapse: collapse;
       margin-top: 10px;
       overflow-x: auto;
-      display: block; 
+      display: block;
     }
     th, td {
       border: 1px solid #ddd;
@@ -104,28 +102,26 @@
       display: flex; 
       gap: 20px;
       justify-content: center;
-      flex-wrap: wrap; /* Para quebrar em telas menores */
+      flex-wrap: wrap;
     }
     .resumo-box {
-      flex: 1 1 400px; /* Cresce e diminui conforme espaço */
+      flex: 1 1 400px;
       max-width: 600px;
       background: #fff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    /* Centraliza a tabela dentro do resumo */
     .resumo-table-container {
       margin: 0 auto;
       overflow-x: auto;
       text-align: center;
     }
     .resumo-table-container table {
-      margin: 10px auto 0 auto; /* Centraliza a tabela em si */
-      width: auto;              /* Para que não ocupe 100% se não precisar */
+      margin: 10px auto 0 auto;
+      width: auto;
     }
 
-    /* Container de botões na parte de baixo do resumo */
     .btn-container {
       margin-top: 15px;
       text-align: center;
@@ -201,7 +197,6 @@
 
   <!-- Resumos lado a lado -->
   <div class="resumos-container">
-    
     <div class="resumo-box">
       <h2>RESUMO DE CÓDIGOS (COLUNA 4)</h2>
       <div class="resumo-table-container">
@@ -387,7 +382,7 @@
       });
     }
 
-    // Copiar tabelas / converter
+    // Funções para copiar o conteúdo das tabelas
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
@@ -577,11 +572,15 @@
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
-      for (let row of tbody.rows) {
-        let cell = row.cells[5]; // Coluna 9
+      // Atualiza cada célula da coluna 9 e também o array processedData
+      for (let i = 0; i < tbody.rows.length; i++) {
+        let cell = tbody.rows[i].cells[5]; // Coluna 9
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
           cell.textContent = newColorText;
+          cell.style.color = newColorText; // opcional: altera a cor do texto exibido
+          // Atualiza o processedData para que as exportações reflitam a mudança
+          processedData[i][5] = newColorText;
           console.log("Atualizou célula:", cell.textContent);
         }
       }
