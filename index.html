@@ -6,12 +6,8 @@
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    /* Reset básico */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    /* Reset Básico */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f7fa;
@@ -66,26 +62,35 @@
       text-align: center;
       word-break: break-word;
     }
-    th {
-      background: #f0f0f0;
+    th { background: #f0f0f0; }
+    /* Layout para resumos lado a lado */
+    .resumos-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
     }
+    .resumo-box {
+      flex: 1 1 400px;
+      max-width: 600px;
+      background: #fff;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    .resumo-box > div { text-align: center; margin-top: 10px; }
     @media (max-width: 600px) {
-      th, td {
-        padding: 8px 4px;
-      }
-      button {
-        padding: 8px 12px;
-        font-size: 14px;
-      }
+      th, td { padding: 8px 4px; }
+      button { padding: 8px 12px; font-size: 14px; }
     }
   </style>
 </head>
 <body>
 
   <h1>Leitor e Processador de CSV</h1>
-
   <div class="container">
-    <input type="file" id="csvFile" accept=".csv">
+    <!-- Aceita CSV e TXT -->
+    <input type="file" id="csvFile" accept=".csv,.txt">
     <div>
       <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
       <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
@@ -109,17 +114,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Dados serão inseridos via CSV. Para teste, você pode incluir linhas temporárias.
-             Exemplo:
-        <tr>
-          <td>1</td><td>P01</td><td>ACM-PORTA</td><td>PORTA PIVOTANTE EM ACM</td>
-          <td>1700</td><td>PINTURA PRETO FOSCO - RAL9005F</td><td>ACM</td><td>Layer</td>
-        </tr>
-        <tr>
-          <td>2</td><td>AD-2</td><td>REH-JUNÇÃO 90º</td><td>FIXO 02 MODULOS CONJUGADOS EM 90° COM PERFIL NA ESQUINA</td>
-          <td>2955</td><td>MAR - CEY - CEY</td><td>Fixo</td><td>PVC</td>
-        </tr>
-        -->
+        <!-- A tabela será preenchida após o carregamento do CSV -->
       </tbody>
     </table>
   </div>
@@ -135,46 +130,43 @@
     </div>
   </div>
 
-  <div class="container">
-    <div>
-      <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
-      <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
-      <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
+  <!-- Área dos Resumos - organizados lado a lado -->
+  <div class="resumos-container">
+    <div class="resumo-box">
+      <h2>Resumo de Códigos (Coluna 4)</h2>
+      <table id="summaryTable">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Quantidade</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div>
+        <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
+        <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
+        <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
+      </div>
     </div>
-  </div>
 
-  <div class="container">
-    <h2>Resumo de Códigos (Coluna 4)</h2>
-    <table id="summaryTable">
-      <thead>
-        <tr>
-          <th>Código</th>
-          <th>Quantidade</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <div class="container">
-    <div>
-      <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
-      <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
-      <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
+    <div class="resumo-box">
+      <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
+      <table id="summaryTable2">
+        <thead>
+          <tr>
+            <th>Tipo</th>
+            <th>Quantidade</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div>
+        <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
+        <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
+        <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
+      </div>
     </div>
-  </div>
-
-  <div class="container">
-    <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
-    <table id="summaryTable2">
-      <thead>
-        <tr>
-          <th>Tipo</th>
-          <th>Quantidade</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
   </div>
 
   <script>
@@ -229,7 +221,7 @@
       return "PVC";
     }
 
-    // Ao selecionar o arquivo CSV
+    // Ao selecionar o arquivo CSV (ou TXT)
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -279,7 +271,7 @@
       });
     }
 
-    // Renderiza a Tabela Resumo (Novo Código – Coluna 4)
+    // Renderiza a Tabela Resumo (Coluna 4 - Novo Código)
     function renderSummaryTable() {
       const tbody = document.querySelector("#summaryTable tbody");
       tbody.innerHTML = "";
@@ -293,7 +285,7 @@
       tbody.appendChild(trTotal);
     }
 
-    // Renderiza a Tabela Resumo 2 (Novo Código 2 – Coluna 3)
+    // Renderiza a Tabela Resumo 2 (Coluna 3 - Novo Código 2)
     function renderSummaryTable2() {
       const tbody = document.querySelector("#summaryTable2 tbody");
       tbody.innerHTML = "";
@@ -336,7 +328,7 @@
       navigator.clipboard.writeText(text).then(() => { alert("Resumo 2 copiado para a área de transferência!"); });
     }
 
-    // Exporta Planilha 1 para CSV
+    // Exporta Planilha 1 para CSV (observação: CSV não inclui estilos)
     function exportCSV() {
       const header = ["Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4", "Coluna 5", "Coluna 9", "Novo Código", "Novo Código 2"];
       let csvContent = header.join(",") + "\n";
@@ -354,7 +346,7 @@
       document.body.removeChild(a);
     }
 
-    // Exporta Planilha 1 para XLS
+    // Exporta Planilha 1 para XLS (HTML exporta estilos aplicados)
     function exportXLS() {
       let tableHTML = `
         <table border="1">
@@ -487,13 +479,11 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna 9 (índice 5) aplicando a cor escolhida, 
-    // sem alterar o texto existente, se o conteúdo (em caixa alta)
-    // contiver as substrings "CEY-" ou "ROB".
+    // Atualiza a Coluna 9 (índice 5 na Planilha 1) apenas aplicando a cor de fundo,
+    // se o conteúdo (em caixa alta) contiver "CEY-" ou "ROB"
     function updateCol9() {
       const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
       const tbody = document.querySelector("#resultTable tbody");
-      
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9
         let cellText = cell.textContent.toUpperCase();
