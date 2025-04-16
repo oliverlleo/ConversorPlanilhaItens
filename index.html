@@ -22,9 +22,32 @@
       padding: 20px;
     }
     h1, h2, h3 {
-      margin-bottom: 20px;
       text-transform: uppercase;
       text-align: center;
+    }
+    
+    /* Cabeçalho Minimalista */
+    .main-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-bottom: 2px solid #e74c3c; /* detalhe em vermelho */
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .main-header h1 {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+      margin: 0;
+    }
+    .logo {
+      height: 50px; /* ajuste conforme necessário */
     }
 
     /* Barra superior: tudo em uma linha */
@@ -60,8 +83,6 @@
       cursor: pointer;
       font-size: 14px;
     }
-
-    /* Remove o estilo padrão do botão do arquivo em navegadores WebKit */
     .file-group input[type="file"]::-webkit-file-upload-button {
       visibility: hidden;
     }
@@ -84,8 +105,9 @@
       outline: none;
     }
 
+    /* Botões - Tom preto com hover levemente mais escuro */
     button {
-      background: #007BFF;
+      background: #2c2c2c;
       color: #fff;
       border: none;
       padding: 10px 16px;
@@ -94,7 +116,7 @@
       transition: background 0.3s;
     }
     button:hover {
-      background: #0056b3;
+      background: #1a1a1a;
     }
 
     /* Container geral para tabela principal */
@@ -126,7 +148,6 @@
     }
     th {
       background: #f0f0f0;
-      text-align: center;
     }
 
     /* Área dos resumos */
@@ -138,8 +159,6 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-
-    /* Div do resumo */
     .resumo-box {
       flex: 1 1 400px;
       max-width: 600px;
@@ -149,7 +168,6 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
       align-items: center;
       position: relative;
       padding-bottom: 80px;
@@ -161,8 +179,6 @@
       gap: 10px;
       padding-top: 20px;
     }
-
-    /* Centraliza a tabela horizontalmente dentro do container de resumo */
     .resumo-table-container {
       width: 100%;
       text-align: center;
@@ -177,8 +193,6 @@
       width: auto;
       display: inline-block;
     }
-
-    /* Fixação do container de botões na parte inferior do resumo */
     .btn-container {
       width: 100%;
       margin-top: 15px;
@@ -212,23 +226,24 @@
 </head>
 <body>
 
-  <h1>TRATAMENTO PLANILHA ITENS</h1>
+  <!-- Cabeçalho Minimalista -->
+  <header class="main-header">
+    <div class="header-content">
+      <h1>PERFECTA</h1>
+      <img src="logo.png" alt="Logo Perfecta" class="logo">
+    </div>
+  </header>
 
   <!-- Barra superior -->
   <div class="top-bar">
-    <!-- Grupo 1: Escolher arquivo -->
     <div class="file-group">
-      <input type="file" id="csvFile" accept=".csv,.txt" data-listener-added_46132104="true">
+      <input type="file" id="csvFile" accept=".csv,.txt">
     </div>
-
-    <!-- Grupo 2: Botões da planilha -->
     <div class="btn-group">
       <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
       <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
       <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
     </div>
-
-    <!-- Grupo 3: Atualizar Coluna 9 -->
     <div class="update-group">
       <label for="col9Color" style="white-space:nowrap;">COR:</label>
       <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
@@ -251,12 +266,12 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Dados são preenchidos dinamicamente -->
+        <!-- Dados serão preenchidos dinamicamente -->
       </tbody>
     </table>
   </div>
 
-  <!-- Resumos lado a lado -->
+  <!-- Resumos Lado a Lado -->
   <div class="resumos-container">
     <div class="resumo-box">
       <h2>TOTAL PRODUTO</h2>
@@ -305,11 +320,11 @@
 
   <script>
     let processedData = []; // Dados da Planilha 1
-    const summaryCounts = {}; // Contagem dos valores derivados da função getCodigo (PRODUTO)
-    const summaryCounts2 = {}; // Contagem dos valores derivados da função getCodigo2 (CATEGORIA)
+    const summaryCounts = {}; // Contagem para PRODUTO (função getCodigo)
+    const summaryCounts2 = {}; // Contagem para CATEGORIA (função getCodigo2)
     let totalItens = 0;     // Soma dos valores da 8ª coluna do CSV
 
-    // Função para determinar o PRODUTO (a partir da DESCRIÇÃO -> COLUNA 4)
+    // Função para determinar o PRODUTO (a partir da DESCRIÇÃO – COLUNA 4)
     function getCodigo(texto) {
       const str = texto.toLowerCase();
       if (str.includes("fixo")) {
@@ -340,7 +355,7 @@
       return "";
     }
 
-    // Função para determinar a CATEGORIA (a partir dos ITENS -> COLUNA 3)
+    // Função para determinar a CATEGORIA (a partir dos ITENS – COLUNA 3)
     function getCodigo2(texto) {
       const str = texto.toLowerCase();
       if (str.includes("gol")) {
@@ -377,12 +392,10 @@
             // Acrescenta os valores derivados como PRODUTO e CATEGORIA
             const newRow = selected.concat(codigo, codigo2);
             processedData.push(newRow);
-            // Atualiza as contagens para os resumos
             if (codigo) {
               summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-            // Soma a coluna 8 do CSV, se aplicável
             let quantidade = Number(row[7].replace(",", "."));
             if (!isNaN(quantidade)) {
               totalItens += quantidade;
@@ -438,11 +451,10 @@
       });
     }
 
-    // Função para copiar o conteúdo das tabelas (excluindo o cabeçalho)
+    // Função para copiar os dados das tabelas (excluindo os cabeçalhos)
     function copyTableText(tableId) {
       const table = document.getElementById(tableId);
       let text = "";
-      // Copia a partir da segunda linha (pula o cabeçalho)
       for (let i = 1; i < table.rows.length; i++) {
         let rowText = [];
         for (let cell of table.rows[i].cells) {
@@ -471,11 +483,9 @@
       });
     }
 
-    // Exportar tabelas - CSV/XLS
+    // Exportar Tabelas – CSV / XLS
     function exportCSV() {
-      const header = [
-        "TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"
-      ];
+      const header = ["TIPO", "ITENS", "DESCRIÇÃO", "AMBIENTE", "COR", "PRODUTO", "CATEGORIA"];
       let csvContent = header.join(",") + "\n";
       processedData.forEach(row => {
         const line = row.map(item => `"${item}"`).join(",");
@@ -619,7 +629,7 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna COR na Planilha Processada (coluna de índice 4)
+    // Atualiza a Coluna COR na Tabela Processada – Permite atualizações subsequentes
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
@@ -627,17 +637,11 @@
         return;
       }
       const tbody = document.querySelector("#resultTable tbody");
-      // Atualiza cada célula da coluna COR e também o array processedData
       for (let i = 0; i < tbody.rows.length; i++) {
         let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
-        let cellText = cell.textContent.toUpperCase();
-        if (cellText.includes("CEY") || cellText.includes("ROB")) {
-          cell.textContent = newColorText;
-          cell.style.color = newColorText; // Altera a cor do texto exibido
-          // Atualiza o processedData para que as exportações reflitam a mudança
-          processedData[i][4] = newColorText;
-          console.log("Atualizou célula:", cell.textContent);
-        }
+        cell.textContent = newColorText;
+        cell.style.color = newColorText;
+        processedData[i][4] = newColorText;
       }
       alert("Atualização da Coluna COR concluída!");
     }
