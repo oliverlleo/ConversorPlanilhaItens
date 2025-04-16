@@ -26,6 +26,7 @@
       text-transform: uppercase;
       text-align: center;
     }
+
     /* Barra superior: tudo em uma linha */
     .top-bar {
       max-width: 1200px;
@@ -40,6 +41,7 @@
       justify-content: space-between;
       gap: 10px;
     }
+
     .file-group, 
     .btn-group, 
     .update-group {
@@ -47,6 +49,7 @@
       align-items: center;
       gap: 10px;
     }
+
     /* Estilização customizada para o seletor de arquivo */
     .file-group input[type="file"] {
       min-width: 200px;
@@ -57,6 +60,7 @@
       cursor: pointer;
       font-size: 14px;
     }
+
     /* Remove o estilo padrão do botão do arquivo em navegadores WebKit */
     .file-group input[type="file"]::-webkit-file-upload-button {
       visibility: hidden;
@@ -79,6 +83,7 @@
     .file-group input[type="file"]:focus {
       outline: none;
     }
+
     button {
       background: #007BFF;
       color: #fff;
@@ -91,6 +96,7 @@
     button:hover {
       background: #0056b3;
     }
+
     /* Container geral para tabela principal */
     .container {
       max-width: 1200px;
@@ -100,6 +106,7 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
     /* Tabela principal minimalista */
     table {
       width: 100%;
@@ -119,10 +126,10 @@
     }
     th {
       background: #f0f0f0;
-      /* Centraliza o texto horizontalmente */
-      text-align: center;
+      text-align: center; /* Centraliza texto horizontalmente */
     }
-    /* Estilos para os resumos */
+
+    /* Área dos resumos */
     .resumos-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -131,9 +138,11 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-    /* Ajuste da div do resumo:
-       - Container flex vertical com os botões fixos na parte inferior
-       - Conteúdo centralizado horizontalmente */
+
+    /* Div do resumo:
+       - Container flex vertical
+       - Botões fixos na parte inferior
+       - Sem centralizar verticalmente para não "subir" a tabela */
     .resumo-box {
       flex: 1 1 400px;
       max-width: 600px;
@@ -143,15 +152,16 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      /* Centraliza horizontalmente os itens internos */
-      align-items: center;
+      justify-content: space-between; /* Botões ficam "embaixo", título/tabela em cima */
+      align-items: flex-start;        /* Remove a centralização vertical */
     }
-    /* Centraliza a tabela dentro do container de resumo */
+
+    /* Centraliza a tabela horizontalmente dentro do container de resumo */
     .resumo-table-container {
       width: 100%;
-      overflow-x: auto;
       text-align: center;
+      margin: 0 auto;
+      /* Removido overflow-x: auto daqui para evitar esticar, mas pode manter se necessário */
     }
     .resumo-table-container table {
       margin: 0 auto;
@@ -160,7 +170,9 @@
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       width: auto;
+      display: inline-block; /* Permite centralização horizontal por meio do margin: 0 auto */
     }
+
     /* Fixação do container de botões na parte inferior do resumo */
     .btn-container {
       width: 100%;
@@ -173,6 +185,7 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+
     @media (max-width: 600px) {
       th, td {
         padding: 8px 4px;
@@ -181,9 +194,14 @@
         padding: 8px 12px;
         font-size: 14px;
       }
+      /* Caso precise rolar horizontalmente em telas pequenas */
+      .resumo-table-container {
+        overflow-x: auto;
+      }
       .resumo-table-container table {
         width: 100%;
         margin: 10px 0;
+        display: table;  /* Volta a display table para ocupar toda a largura em mobile */
       }
     }
   </style>
