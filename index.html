@@ -10,8 +10,8 @@
   <style>
     /* Reset Básico */
     * {
-      box-sizing: border-box; 
-      margin: 0; 
+      box-sizing: border-box;
+      margin: 0;
       padding: 0;
     }
     body {
@@ -41,19 +41,17 @@
       justify-content: space-between;
       gap: 10px;
     }
-
     /* Cada "setor" na barra superior */
     .file-group, 
     .btn-group, 
     .update-group {
-      display: flex; 
+      display: flex;
       align-items: center;
       gap: 10px;
     }
     .file-group input[type="file"] {
       min-width: 200px;
     }
-
     button {
       background: #007BFF;
       color: #fff;
@@ -76,7 +74,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
     /* Tabela principal */
     table {
       width: 100%;
@@ -93,17 +90,20 @@
     }
     th {
       background: #f0f0f0;
+      text-align: center;
     }
-
-    /* Área das duas tabelas de resumo lado a lado */
+    
+    /* Estilos para os resumos */
     .resumos-container {
       max-width: 1200px;
       margin: 0 auto;
-      display: flex; 
+      display: flex;
       gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
     }
+    /* Estiliza a div do resumo como um container flex vertical para centralizar a tabela 
+       e fixar os botões na parte inferior */
     .resumo-box {
       flex: 1 1 400px;
       max-width: 600px;
@@ -111,19 +111,27 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      /* Alinha todo o conteúdo ao centro */
+      align-items: center;
     }
+    /* Centraliza a tabela dentro do container de resumo */
     .resumo-table-container {
       margin: 0 auto;
       overflow-x: auto;
       text-align: center;
+      width: 100%;
     }
     .resumo-table-container table {
-      margin: 10px auto 0 auto;
+      margin: 0 auto;
       width: auto;
     }
-
+    /* Container de botões para fixar na parte inferior do resumo */
     .btn-container {
       margin-top: 15px;
+      width: 100%;
       text-align: center;
     }
     .btn-container .btn-group {
@@ -138,11 +146,11 @@
         padding: 8px 4px;
       }
       button {
-        padding: 8px 12px; 
+        padding: 8px 12px;
         font-size: 14px;
       }
       .resumo-table-container table {
-        width: 100%; 
+        width: 100%;
         margin: 10px 0;
       }
     }
@@ -152,7 +160,7 @@
 
   <h1>PROCESSADOR DE CSV</h1>
 
-  <!-- Barra superior, tudo em linha -->
+  <!-- Barra superior -->
   <div class="top-bar">
     <!-- Grupo 1: Escolher arquivo -->
     <div class="file-group">
@@ -190,7 +198,7 @@
         </tr>
       </thead>
       <tbody>
-        <!-- Dados da tabela são preenchidos dinamicamente -->
+        <!-- Dados são preenchidos dinamicamente -->
       </tbody>
     </table>
   </div>
@@ -298,7 +306,6 @@
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
@@ -306,32 +313,27 @@
           for (let key in summaryCounts) { delete summaryCounts[key]; }
           for (let key in summaryCounts2) { delete summaryCounts2[key]; }
           totalItens = 0;
-
           const rows = results.data;
           // Processa cada linha (ignora linhas com dados insuficientes)
           rows.forEach(row => {
             if (!row || row.length < 9) return;
-            // Mantém as colunas: 1,2,3,4,5,9 (índices: 0,1,2,3,4,8)
+            // Seleciona as colunas: 1,2,3,4,5,9 (índices: 0,1,2,3,4,8)
             const selected = [row[0], row[1], row[2], row[3], row[4], row[8]];
             const codigo = getCodigo(row[3] || "");
             const codigo2 = getCodigo2(row[2] || "");
             const newRow = selected.concat(codigo, codigo2);
-
             processedData.push(newRow);
-
             // Atualiza contagens
-            if (codigo) { 
-              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1; 
+            if (codigo) {
+              summaryCounts[codigo] = (summaryCounts[codigo] || 0) + 1;
             }
             summaryCounts2[codigo2] = (summaryCounts2[codigo2] || 0) + 1;
-
             // Soma coluna 8 (índice 7) se houver
             let quantidade = Number(row[7].replace(",", "."));
-            if (!isNaN(quantidade)) { 
-              totalItens += quantidade; 
+            if (!isNaN(quantidade)) {
+              totalItens += quantidade;
             }
           });
-
           renderResultTable();
           renderSummaryTable();
           renderSummaryTable2();
@@ -397,19 +399,19 @@
     }
     function copyProcessedTable() {
       const text = copyTableText("resultTable");
-      navigator.clipboard.writeText(text).then(() => { 
+      navigator.clipboard.writeText(text).then(() => {
         alert("Planilha 1 copiada para a área de transferência!");
       });
     }
     function copySummaryTable() {
       const text = copyTableText("summaryTable");
-      navigator.clipboard.writeText(text).then(() => { 
+      navigator.clipboard.writeText(text).then(() => {
         alert("Resumo 1 copiado para a área de transferência!");
       });
     }
     function copySummaryTable2() {
       const text = copyTableText("summaryTable2");
-      navigator.clipboard.writeText(text).then(() => { 
+      navigator.clipboard.writeText(text).then(() => {
         alert("Resumo 2 copiado para a área de transferência!");
       });
     }
@@ -417,8 +419,8 @@
     // Exportar tabelas - CSV/XLS
     function exportCSV() {
       const header = [
-        "Coluna 1","Coluna 2","Coluna 3","Coluna 4",
-        "Coluna 5","Coluna 9","Novo Código","Novo Código 2"
+        "Coluna 1", "Coluna 2", "Coluna 3", "Coluna 4",
+        "Coluna 5", "Coluna 9", "Novo Código", "Novo Código 2"
       ];
       let csvContent = header.join(",") + "\n";
       processedData.forEach(row => {
@@ -452,8 +454,8 @@
           <tbody>`;
       processedData.forEach(row => {
         tableHTML += "<tr>";
-        row.forEach(item => { 
-          tableHTML += "<td>" + item + "</td>"; 
+        row.forEach(item => {
+          tableHTML += "<td>" + item + "</td>";
         });
         tableHTML += "</tr>";
       });
@@ -500,8 +502,8 @@
       rows.forEach(row => {
         tableHTML += "<tr>";
         const cells = row.querySelectorAll("td");
-        cells.forEach(cell => { 
-          tableHTML += "<td>" + cell.innerText + "</td>"; 
+        cells.forEach(cell => {
+          tableHTML += "<td>" + cell.innerText + "</td>";
         });
         tableHTML += "</tr>";
       });
@@ -548,8 +550,8 @@
       rows.forEach(row => {
         tableHTML += "<tr>";
         const cells = row.querySelectorAll("td");
-        cells.forEach(cell => { 
-          tableHTML += "<td>" + cell.innerText + "</td>"; 
+        cells.forEach(cell => {
+          tableHTML += "<td>" + cell.innerText + "</td>";
         });
         tableHTML += "</tr>";
       });
@@ -578,7 +580,7 @@
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
           cell.textContent = newColorText;
-          cell.style.color = newColorText; // opcional: altera a cor do texto exibido
+          cell.style.color = newColorText; // Altera a cor do texto exibido
           // Atualiza o processedData para que as exportações reflitam a mudança
           processedData[i][5] = newColorText;
           console.log("Atualizou célula:", cell.textContent);
