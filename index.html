@@ -10,15 +10,14 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
     .resumo-container {
-  display: flex;
-  justify-content: center;
-  padding: 40px 20px;
-}
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
     #resultTable {
-  margin: 0 auto;
-  display: table;
-}
-
+      margin: 0 auto;
+      display: table;
+    }
     /* Reset Básico */
     * {
       box-sizing: border-box;
@@ -36,7 +35,6 @@
       text-transform: uppercase;
       text-align: center;
     }
-    
     /* Cabeçalho Minimalista */
     .main-header {
       display: flex;
@@ -60,7 +58,6 @@
     .logo {
       height: 50px; /* ajuste conforme necessário */
     }
-
     /* Barra superior: tudo em uma linha */
     .top-bar {
       max-width: 1200px;
@@ -75,7 +72,6 @@
       justify-content: space-between;
       gap: 10px;
     }
-
     .file-group, 
     .btn-group, 
     .update-group {
@@ -83,7 +79,6 @@
       align-items: center;
       gap: 10px;
     }
-
     /* Estilização customizada para o seletor de arquivo */
     .file-group input[type="file"] {
       min-width: 200px;
@@ -115,7 +110,6 @@
     .file-group input[type="file"]:focus {
       outline: none;
     }
-
     /* Botões - Tom preto com hover levemente mais escuro */
     button {
       background: #2c2c2c;
@@ -129,7 +123,6 @@
     button:hover {
       background: #1a1a1a;
     }
-
     /* Container geral para tabela principal */
     .container {
       max-width: 1200px;
@@ -139,7 +132,6 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
     /* Tabela principal minimalista */
     table {
       width: 100%;
@@ -160,7 +152,6 @@
     th {
       background: #f0f0f0;
     }
-
     /* Área dos resumos */
     .resumos-container {
       max-width: 1200px;
@@ -170,33 +161,27 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-   .resumo-box {
-  flex: 1 1 400px;
-  max-width: 600px;
-  background: #fff;
-  padding: 20px;           /* Mantém apenas esse padding */
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  /* Remova ou comente as linhas abaixo, caso existam:
-     position: relative;
-     padding-bottom: 80px;
-  */
-}
-
-.btn-container {
-  margin-top: auto;        /* Joga os botões para a parte de baixo do card */
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  padding-top: 20px;
-}
-    .resumo-table-container {.resumo-table-container {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-}
+    .resumo-box {
+      flex: 1 1 400px;
+      max-width: 600px;
+      background: #fff;
+      padding: 20px; /* Mantém apenas esse padding */
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .btn-container {
+      margin-top: auto;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding-top: 20px;
+    }
+    .resumo-table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
     }
     .resumo-table-container table {
       margin: 0 auto;
@@ -218,7 +203,6 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-
     @media (max-width: 600px) {
       th, td {
         padding: 8px 4px;
@@ -239,7 +223,6 @@
   </style>
 </head>
 <body>
-
   <!-- Cabeçalho Minimalista -->
   <header class="main-header">
     <div class="header-content">
@@ -247,7 +230,6 @@
       <img src="LOGO.png" alt="Logo Perfecta" class="logo">
     </div>
   </header>
-
   <!-- Barra superior -->
   <div class="top-bar">
     <div class="file-group">
@@ -264,7 +246,6 @@
       <button onclick="updateCol9()">Confirmar</button>
     </div>
   </div>
-
   <div class="container">
     <h2>TABELA PROCESSADA</h2>
     <table id="resultTable">
@@ -284,7 +265,6 @@
       </tbody>
     </table>
   </div>
-
   <!-- Resumos Lado a Lado -->
   <div class="resumos-container">
     <div class="resumo-box">
@@ -308,7 +288,6 @@
         </div>
       </div>
     </div>
-
     <div class="resumo-box">
       <h2>TOTAL CATEGORIA</h2>
       <div class="resumo-table-container">
@@ -331,7 +310,6 @@
       </div>
     </div>
   </div>
-
   <script>
     let processedData = []; // Dados da Planilha 1
     const summaryCounts = {}; // Contagem para PRODUTO (função getCodigo)
@@ -478,6 +456,7 @@
       }
       return text;
     }
+
     function copyProcessedTable() {
       const text = copyTableText("resultTable");
       navigator.clipboard.writeText(text).then(() => {
@@ -514,6 +493,7 @@
       a.click();
       document.body.removeChild(a);
     }
+
     function exportXLS() {
       let tableHTML = `
         <table border="1">
@@ -546,6 +526,7 @@
       a.click();
       document.body.removeChild(a);
     }
+
     function exportCSVSummary() {
       const header = ["PRODUTO", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
@@ -565,6 +546,7 @@
       a.click();
       document.body.removeChild(a);
     }
+
     function exportXLSSummary() {
       let tableHTML = `
         <table border="1">
@@ -594,6 +576,7 @@
       a.click();
       document.body.removeChild(a);
     }
+
     function exportCSVSummary2() {
       const header = ["CATEGORIA", "QUANTIDADE"];
       let csvContent = header.join(",") + "\n";
@@ -613,6 +596,7 @@
       a.click();
       document.body.removeChild(a);
     }
+
     function exportXLSSummary2() {
       let tableHTML = `
         <table border="1">
@@ -643,19 +627,23 @@
       document.body.removeChild(a);
     }
 
-    // Atualiza a Coluna COR na Tabela Processada – Permite atualizações subsequentes
+    // Atualiza a Coluna COR na Tabela Processada – somente para linhas que contenham "CEY" ou "ROB" na coluna ITENS (índice 1)
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
         alert("Informe o novo texto (cor) para atualização.");
         return;
       }
-      const tbody = document.querySelector(" tbody");
-      for (let i = 0; i < tbody.rows.length; i++) {
-        let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
-        cell.textContent = newColorText;
-        cell.style.color = newColorText;
-        processedData[i][4] = newColorText;
+      const tbody = document.querySelector("#resultTable tbody");
+      for (let i = 0; i < processedData.length; i++) {
+        // Verifica se na coluna "ITENS" contém "CEY" ou "ROB" (case insensitive)
+        const itensValue = processedData[i][1] ? processedData[i][1].toLowerCase() : "";
+        if (itensValue.includes("cey") || itensValue.includes("rob")) {
+          let cell = tbody.rows[i].cells[4]; // Coluna COR (índice 4)
+          cell.textContent = newColorText;
+          cell.style.color = newColorText;
+          processedData[i][4] = newColorText;
+        }
       }
       alert("Atualização da Coluna COR concluída!");
     }
