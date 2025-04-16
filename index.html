@@ -63,7 +63,8 @@
       word-break: break-word;
     }
     th { background: #f0f0f0; }
-    /* Layout para resumos lado a lado */
+
+    /* Layout para os resumos lado a lado com conteúdo centralizado e botões fixos na parte inferior */
     .resumos-container {
       display: flex;
       flex-wrap: wrap;
@@ -71,14 +72,26 @@
       justify-content: center;
     }
     .resumo-box {
-      flex: 1 1 400px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
       max-width: 600px;
       background: #fff;
       padding: 15px;
       border: 1px solid #ddd;
       border-radius: 8px;
     }
-    .resumo-box > div { text-align: center; margin-top: 10px; }
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-bottom: 10px;
+    }
+    .btn-container {
+      margin-top: auto;
+      width: 100%;
+      text-align: center;
+    }
     @media (max-width: 600px) {
       th, td { padding: 8px 4px; }
       button { padding: 8px 12px; font-size: 14px; }
@@ -122,8 +135,8 @@
   <div class="update-panel">
     <h3>Atualizar Coluna 9</h3>
     <div>
-      <label for="col9Color">Cor (HEX ou nome):</label>
-      <input type="text" id="col9Color" placeholder="#ff0000 ou red">
+      <label for="col9Color">Nova cor (texto):</label>
+      <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
     </div>
     <div>
       <button onclick="updateCol9()">Confirmar Atualização</button>
@@ -134,16 +147,18 @@
   <div class="resumos-container">
     <div class="resumo-box">
       <h2>Resumo de Códigos (Coluna 4)</h2>
-      <table id="summaryTable">
-        <thead>
-          <tr>
-            <th>Código</th>
-            <th>Quantidade</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div>
+      <div class="table-container">
+        <table id="summaryTable">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="btn-container">
         <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
         <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
         <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
@@ -152,16 +167,18 @@
 
     <div class="resumo-box">
       <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
-      <table id="summaryTable2">
-        <thead>
-          <tr>
-            <th>Tipo</th>
-            <th>Quantidade</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div>
+      <div class="table-container">
+        <table id="summaryTable2">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Quantidade</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="btn-container">
         <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
         <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
         <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
@@ -346,7 +363,7 @@
       document.body.removeChild(a);
     }
 
-    // Exporta Planilha 1 para XLS (HTML exporta estilos aplicados)
+    // Exporta Planilha 1 para XLS (o HTML exporta os estilos aplicados)
     function exportXLS() {
       let tableHTML = `
         <table border="1">
@@ -480,18 +497,21 @@
     }
 
     // Atualiza a Coluna 9 (índice 5 na Planilha 1)
-    // Verifica se o conteúdo (em caixa alta) contém "CEY" ou "ROB"
-    // Se sim, aplica a cor de fundo e modifica o formato do texto (negrito e cor da fonte branca)
+    // Se o conteúdo (em caixa alta) contiver "CEY" ou "ROB",
+    // o texto da célula é substituído pelo valor digitado no campo.
     function updateCol9() {
-      const color = document.getElementById("col9Color").value || "yellow"; // cor padrão se vazio
+      const newColorText = document.getElementById("col9Color").value.trim();
+      if (!newColorText) {
+        alert("Informe o novo texto (cor) para atualização.");
+        return;
+      }
       const tbody = document.querySelector("#resultTable tbody");
       for (let row of tbody.rows) {
         let cell = row.cells[5]; // Coluna 9
         let cellText = cell.textContent.toUpperCase();
         if (cellText.includes("CEY") || cellText.includes("ROB")) {
-          cell.style.backgroundColor = color;
-          cell.style.fontWeight = "bold";
-          cell.style.color = "#fff";
+          cell.textContent = newColorText;
+          console.log("Atualizou célula:", cell.textContent);
         }
       }
       alert("Atualização da Coluna 9 concluída!");
