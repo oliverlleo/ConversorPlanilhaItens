@@ -2,14 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Processador de CSV</title>
+  <title>PROCESSADOR DE CSV</title>
   <!-- Biblioteca PapaParse para ler CSV -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700&display=swap" rel="stylesheet">
   <style>
     /* Reset Básico */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Roboto', sans-serif;
       background: #f5f7fa;
       color: #333;
       line-height: 1.6;
@@ -18,8 +19,9 @@
     h1, h2, h3 {
       text-align: center;
       margin-bottom: 20px;
+      text-transform: uppercase;
     }
-    .container, .update-panel {
+    .container, .update-panel, .resumo-box {
       max-width: 1200px;
       background: #fff;
       padding: 20px;
@@ -36,7 +38,7 @@
       border-radius: 4px;
       width: 100%;
     }
-    button {
+    .btn-primary {
       background: #007BFF;
       color: #fff;
       border: none;
@@ -46,7 +48,7 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-    button:hover {
+    .btn-primary:hover {
       background: #0056b3;
     }
     table {
@@ -63,8 +65,26 @@
       word-break: break-word;
     }
     th { background: #f0f0f0; }
-
-    /* Layout para os resumos lado a lado com conteúdo centralizado e botões fixos na parte inferior */
+    /* Área de atualização combinada com container superior */
+    .top-container {
+      max-width: 1200px;
+      background: #fff;
+      padding: 20px;
+      margin: 20px auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 20px;
+    }
+    .top-container > div { flex: 1; }
+    .update-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    /* Layout para os resumos lado a lado, com centralização da tabela */
     .resumos-container {
       display: flex;
       flex-wrap: wrap;
@@ -84,46 +104,63 @@
     }
     .table-container {
       width: 100%;
-      overflow-x: auto;
+      display: flex;
+      justify-content: center;
       margin-bottom: 10px;
     }
+    .table-container table { width: 90%; }
     .btn-container {
       margin-top: auto;
       width: 100%;
       text-align: center;
     }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     @media (max-width: 600px) {
       th, td { padding: 8px 4px; }
-      button { padding: 8px 12px; font-size: 14px; }
+      .btn-primary { padding: 8px 12px; font-size: 14px; }
+      .table-container table { width: 100%; }
     }
   </style>
 </head>
 <body>
 
-  <h1>Leitor e Processador de CSV</h1>
-  <div class="container">
-    <!-- Aceita arquivos CSV e TXT -->
-    <input type="file" id="csvFile" accept=".csv,.txt">
+  <h1>PROCESSADOR DE CSV</h1>
+  
+  <div class="top-container">
     <div>
-      <button onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
-      <button onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
-      <button onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+      <!-- Aceita arquivos CSV e TXT -->
+      <input type="file" id="csvFile" accept=".csv,.txt">
+    </div>
+    <div class="btn-group">
+      <button class="btn-primary" onclick="exportCSV()">Exportar CSV (Planilha 1)</button>
+      <button class="btn-primary" onclick="exportXLS()">Exportar XLS (Planilha 1)</button>
+      <button class="btn-primary" onclick="copyProcessedTable()">Copiar Planilha 1 (para Notion)</button>
+    </div>
+    <div class="update-group">
+      <label for="col9Color">ATUALIZAR COLUNA 9:</label>
+      <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
+      <button class="btn-primary" onclick="updateCol9()">Confirmar</button>
     </div>
   </div>
 
   <div class="container">
-    <h2>Tabela Processada</h2>
+    <h2>TABELA PROCESSADA</h2>
     <table id="resultTable">
       <thead>
         <tr>
-          <th>Coluna 1</th>
-          <th>Coluna 2</th>
-          <th>Coluna 3</th>
-          <th>Coluna 4</th>
-          <th>Coluna 5</th>
-          <th>Coluna 9</th>
-          <th>Novo Código</th>
-          <th>Novo Código 2</th>
+          <th>COLUNA 1</th>
+          <th>COLUNA 2</th>
+          <th>COLUNA 3</th>
+          <th>COLUNA 4</th>
+          <th>COLUNA 5</th>
+          <th>COLUNA 9</th>
+          <th>NOVO CÓDIGO</th>
+          <th>NOVO CÓDIGO 2</th>
         </tr>
       </thead>
       <tbody>
@@ -132,56 +169,49 @@
     </table>
   </div>
 
-  <div class="update-panel">
-    <h3>Atualizar Coluna 9</h3>
-    <div>
-      <label for="col9Color">Nova cor (texto):</label>
-      <input type="text" id="col9Color" placeholder="Ex.: red ou #ff0000">
-    </div>
-    <div>
-      <button onclick="updateCol9()">Confirmar Atualização</button>
-    </div>
-  </div>
-
   <!-- Área dos Resumos - organizados lado a lado -->
   <div class="resumos-container">
     <div class="resumo-box">
-      <h2>Resumo de Códigos (Coluna 4)</h2>
+      <h2>RESUMO DE CÓDIGOS (COLUNA 4)</h2>
       <div class="table-container">
         <table id="summaryTable">
           <thead>
             <tr>
-              <th>Código</th>
-              <th>Quantidade</th>
+              <th>CÓDIGO</th>
+              <th>QUANTIDADE</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="btn-container">
-        <button onclick="exportCSVSummary()">Exportar CSV (Resumo 1)</button>
-        <button onclick="exportXLSSummary()">Exportar XLS (Resumo 1)</button>
-        <button onclick="copySummaryTable()">Copiar Resumo 1 (para Notion)</button>
+        <div class="btn-group">
+          <button class="btn-primary" onclick="exportCSVSummary()">Exportar CSV</button>
+          <button class="btn-primary" onclick="exportXLSSummary()">Exportar XLS</button>
+          <button class="btn-primary" onclick="copySummaryTable()">Copiar (para Notion)</button>
+        </div>
       </div>
     </div>
 
     <div class="resumo-box">
-      <h2>Resumo de Códigos (Coluna 3 - Novo Código 2)</h2>
+      <h2>RESUMO DE CÓDIGOS (COLUNA 3 - NOVO CÓDIGO 2)</h2>
       <div class="table-container">
         <table id="summaryTable2">
           <thead>
             <tr>
-              <th>Tipo</th>
-              <th>Quantidade</th>
+              <th>TIPO</th>
+              <th>QUANTIDADE</th>
             </tr>
           </thead>
           <tbody></tbody>
         </table>
       </div>
       <div class="btn-container">
-        <button onclick="exportCSVSummary2()">Exportar CSV (Resumo 2)</button>
-        <button onclick="exportXLSSummary2()">Exportar XLS (Resumo 2)</button>
-        <button onclick="copySummaryTable2()">Copiar Resumo 2 (para Notion)</button>
+        <div class="btn-group">
+          <button class="btn-primary" onclick="exportCSVSummary2()">Exportar CSV</button>
+          <button class="btn-primary" onclick="exportXLSSummary2()">Exportar XLS</button>
+          <button class="btn-primary" onclick="copySummaryTable2()">Copiar (para Notion)</button>
+        </div>
       </div>
     </div>
   </div>
@@ -242,7 +272,6 @@
     document.getElementById('csvFile').addEventListener('change', function(e) {
       const file = e.target.files[0];
       if (!file) return;
-
       Papa.parse(file, {
         complete: function(results) {
           processedData = [];
@@ -498,7 +527,7 @@
 
     // Atualiza a Coluna 9 (índice 5 na Planilha 1)
     // Se o conteúdo (em caixa alta) contiver "CEY" ou "ROB",
-    // o texto da célula é substituído pelo valor digitado no campo.
+    // substitui o texto da célula pelo valor digitado no campo.
     function updateCol9() {
       const newColorText = document.getElementById("col9Color").value.trim();
       if (!newColorText) {
