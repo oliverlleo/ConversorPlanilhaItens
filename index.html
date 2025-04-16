@@ -26,7 +26,6 @@
       text-transform: uppercase;
       text-align: center;
     }
-
     /* Barra superior: tudo em uma linha */
     .top-bar {
       max-width: 1200px;
@@ -41,7 +40,6 @@
       justify-content: space-between;
       gap: 10px;
     }
-    /* Cada "setor" na barra superior */
     .file-group, 
     .btn-group, 
     .update-group {
@@ -49,8 +47,37 @@
       align-items: center;
       gap: 10px;
     }
+    /* Estilização customizada para o seletor de arquivo */
     .file-group input[type="file"] {
       min-width: 200px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background-color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    /* Remove o estilo padrão do botão do arquivo em navegadores WebKit */
+    .file-group input[type="file"]::-webkit-file-upload-button {
+      visibility: hidden;
+    }
+    .file-group input[type="file"]::before {
+      content: 'Escolher arquivo';
+      display: inline-block;
+      background: #007BFF;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+    }
+    .file-group input[type="file"]:hover::before {
+      background: #0056b3;
+    }
+    .file-group input[type="file"]:focus {
+      outline: none;
     }
     button {
       background: #007BFF;
@@ -64,7 +91,6 @@
     button:hover {
       background: #0056b3;
     }
-
     /* Container geral para tabela principal */
     .container {
       max-width: 1200px;
@@ -74,13 +100,16 @@
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    /* Tabela principal */
+    /* Tabela principal minimalista */
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       margin-top: 10px;
       overflow-x: auto;
       display: block;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #ddd;
@@ -90,9 +119,9 @@
     }
     th {
       background: #f0f0f0;
+      /* Centraliza o texto horizontalmente */
       text-align: center;
     }
-    
     /* Estilos para os resumos */
     .resumos-container {
       max-width: 1200px;
@@ -102,8 +131,9 @@
       justify-content: center;
       flex-wrap: wrap;
     }
-    /* Estiliza a div do resumo como um container flex vertical para centralizar a tabela 
-       e fixar os botões na parte inferior */
+    /* Ajuste da div do resumo:
+       - Container flex vertical com os botões fixos na parte inferior
+       - Conteúdo centralizado horizontalmente */
     .resumo-box {
       flex: 1 1 400px;
       max-width: 600px;
@@ -114,24 +144,27 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      /* Alinha todo o conteúdo ao centro */
+      /* Centraliza horizontalmente os itens internos */
       align-items: center;
     }
     /* Centraliza a tabela dentro do container de resumo */
     .resumo-table-container {
-      margin: 0 auto;
+      width: 100%;
       overflow-x: auto;
       text-align: center;
-      width: 100%;
     }
     .resumo-table-container table {
       margin: 0 auto;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
       width: auto;
     }
-    /* Container de botões para fixar na parte inferior do resumo */
+    /* Fixação do container de botões na parte inferior do resumo */
     .btn-container {
-      margin-top: 15px;
       width: 100%;
+      margin-top: 15px;
       text-align: center;
     }
     .btn-container .btn-group {
@@ -140,7 +173,6 @@
       flex-wrap: wrap;
       justify-content: center;
     }
-
     @media (max-width: 600px) {
       th, td {
         padding: 8px 4px;
@@ -164,7 +196,7 @@
   <div class="top-bar">
     <!-- Grupo 1: Escolher arquivo -->
     <div class="file-group">
-      <input type="file" id="csvFile" accept=".csv,.txt">
+      <input type="file" id="csvFile" accept=".csv,.txt" data-listener-added_46132104="true">
     </div>
 
     <!-- Grupo 2: Botões da planilha -->
